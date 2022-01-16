@@ -1,4 +1,5 @@
 import pygame
+import random
 import ChessEngine
 
 WIDTH = HEIGHT = 512
@@ -6,11 +7,13 @@ DIMENSION = 8
 SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15
 IMAGES = {}
+RANDOM_COLORS = [[(202, 164, 114), (150, 75, 0)], [(140, 80, 0), (50, 50, 50)], [(255,233,197), (50, 50, 50)], [(250, 250, 250), (70, 70, 70)]]
+colors = random.choice(RANDOM_COLORS)
 
 def loadImages():
     pieces = ["wP", "wR", "wN", "wB", "wQ", "wK", "bP", "bR", "bN", "bB", "bQ", "bK"]
     for piece in pieces:
-        IMAGES[piece] = pygame.transform.scale(pygame.image.load("pygameProjects/Chess/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) 
+        IMAGES[piece] = pygame.transform.scale(pygame.image.load("Chess/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) 
 
 # This will handle user input and update the graphics
 
@@ -67,7 +70,6 @@ def drawGameState(screen, gs):
     drawPieces(screen, gs.board)
 
 def drawBoard(screen):
-    colors = ["white", "gray"]
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             color = colors[(c+r)%2]
