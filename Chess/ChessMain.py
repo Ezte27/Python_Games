@@ -45,13 +45,14 @@ def main():
                     playerClicks.append(sqSelected)
                 if len(playerClicks) == 2:
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                    if move in validMoves:
-                        print(move.getChessNotation())
-                        gs.makeMove(move)
-                        moveMade = True
-                        sqSelected = () # Reset user clicks
-                        playerClicks = []
-                    else:
+                    for i in range(len(validMoves)):
+                        if move == validMoves[i]:
+                            print(move.getChessNotation())
+                            gs.makeMove(validMoves[i])
+                            moveMade = True
+                            sqSelected = () # Reset user clicks
+                            playerClicks = []
+                    if not moveMade:
                         playerClicks = [sqSelected]
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_z:
