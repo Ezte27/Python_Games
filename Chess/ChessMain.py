@@ -13,7 +13,7 @@ colors = random.choice(RANDOM_COLORS)
 def loadImages():
     pieces = ["wP", "wR", "wN", "wB", "wQ", "wK", "bP", "bR", "bN", "bB", "bQ", "bK"]
     for piece in pieces:
-        IMAGES[piece] = pygame.transform.scale(pygame.image.load("Chess/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) 
+        IMAGES[piece] = pygame.transform.scale(pygame.image.load(r"C:\Users\ested\Documents\Programming\Python_Games\Chess\images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) 
 
 # This will handle user input and update the graphics
 
