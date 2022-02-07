@@ -200,14 +200,14 @@ if swordP != 0:
         print('---------------------------------------------------------------------------------------')
         print(TileMap)
         if saveMap == 'y':
-                with open(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\maps.json', 'r') as f:
+                with open('OSRS_python\maps.json', 'r') as f:
                         data = json.load(f)
                 TileMapDict = {
                         "id": len(data['maps']) + 1,
                         "TileMap": TileMap
                 }
                 data["maps"].append(TileMapDict)
-                with open(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\maps.json', 'w') as f:
+                with open('OSRS_python\maps.json', 'w') as f:
                         json.dump(data, f, indent=4)
         else:
                 pass
@@ -238,13 +238,13 @@ if createMap:
 
 save_map = True
 if save_map and createMap:
-        with open(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\maps.json', 'r') as f:
+        with open('OSRS_python\maps.json', 'r') as f:
                 data = json.load(f)
                 TileMapDict = {
                 "id": len(data['maps']) + 1,
                 "TileMap": MAP}
                 data["maps"].append(TileMapDict)
-        with open(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\maps.json', 'w') as f:
+        with open('OSRS_python\maps.json', 'w') as f:
                 json.dump(data, f, indent=4)
 else:
         pass

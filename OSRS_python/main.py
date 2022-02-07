@@ -6,40 +6,40 @@ from sprites import *
 import sys, random, json, time
 
 mapId = 5#int(input('Choose Map: ')) - 1
-with open(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\maps.json', 'r') as f:
+with open('OSRS_python/maps.json', 'r') as f:
     data = json.load(f)
 map = data['maps'][mapId]['TileMap']
 
-image = Image.open(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\Door.png')
+image = Image.open('OSRS_python/img/Door.png')
 #image = image.resize((TILESIZE, TILESIZE))
 print(image.size)
-#image.save(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\.png')
+#image.save(r'C:/Users/esteb/OneDrive/Documents/Programming/pygameProjects/OSRS_python/img/.png')
 
 class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.Font(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\fonts\Roboto-Medium.ttf', 48)
-        self.heartFont = pygame.font.Font(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\fonts\Roboto-Medium.ttf', 22)
+        self.font = pygame.font.Font('OSRS_python/Gamefonts/Roboto-Medium.ttf', 48)  
+        self.heartFont = pygame.font.Font('OSRS_python/Gamefonts/Roboto-Medium.ttf', 22)
         self.running = True
         self.pressed = False
         self.timer = 0.0
         self.enemyList = []
 
-        self.character_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\character.png')
-        self.terrain_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\terrain.png')
-        self.enemy_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\enemy.png')
-        self.intro_background = pygame.image.load(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\introbackground.png')
-        self.go_background = pygame.image.load(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\gameover.png')
-        self.sword_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\sword.png')
-        self.attack_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\attack.png')
-        self.chest_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\chest2.png')
-        self.tree_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\Pines.png')
-        self.apple_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\apple.png')
-        self.axe_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\axe.png')
-        self.keys_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\KeyIcons.png')
-        self.doors_spritesheet = SpriteSheet(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\img\Door.png')
+        self.character_spritesheet = SpriteSheet('OSRS_python/img/character.png')
+        self.terrain_spritesheet = SpriteSheet('OSRS_python/img/terrain.png')
+        self.enemy_spritesheet = SpriteSheet('OSRS_python/img/enemy.png')
+        self.intro_background = pygame.image.load('OSRS_python/img/introbackground.png')
+        self.go_background = pygame.image.load('OSRS_python/img/gameover.png')
+        self.sword_spritesheet = SpriteSheet('OSRS_python/img/sword.png')
+        self.attack_spritesheet = SpriteSheet('OSRS_python/img/attack.png')
+        self.chest_spritesheet = SpriteSheet('OSRS_python/img/chest2.png')
+        self.tree_spritesheet = SpriteSheet('OSRS_python/img/Pines.png')
+        self.apple_spritesheet = SpriteSheet('OSRS_python/img/apple.png')
+        self.axe_spritesheet = SpriteSheet('OSRS_python/img/axe.png')
+        self.keys_spritesheet = SpriteSheet('OSRS_python/img/KeyIcons.png')
+        self.doors_spritesheet = SpriteSheet('OSRS_python/img/Door.png')
         self.sword_surf = self.sword_spritesheet.get_sprite(0, 0, 64, 64, 'black')
         self.axe_surf = self.axe_spritesheet.get_sprite(0, 0, 96, 96, 'black')
 

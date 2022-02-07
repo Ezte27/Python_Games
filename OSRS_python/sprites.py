@@ -651,7 +651,7 @@ class enemyHealth(pygame.sprite.Sprite):
     
 class Button:
     def __init__(self, x, y, width, height, fg, bg, content, fontsize):
-        self.font = pygame.font.Font(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\fonts\Roboto-Medium.ttf', fontsize)
+        self.font = pygame.font.Font('OSRS_python/Gamefonts/Roboto-Medium.ttf', fontsize)
         self.content = content
 
         self.x = x
