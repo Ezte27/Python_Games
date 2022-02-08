@@ -7,6 +7,7 @@ from debug import debug
 from support import import_csv_layout, import_folder
 from random import choice
 from ui import UI
+from tree import Tree
 
 class Level:
     def __init__(self):
@@ -29,14 +30,14 @@ class Level:
     
     def create_map(self):
         layouts = {
-            'boundary': import_csv_layout(r'C:\Users\ested\Documents\Programming\Python_Games\Zelda2D\map\map_FloorBlocks.csv'),
-            'grass': import_csv_layout(r'C:\Users\ested\Documents\Programming\Python_Games\Zelda2D\map\map_Grass.csv'),
-            'object': import_csv_layout(r'C:\Users\ested\Documents\Programming\Python_Games\Zelda2D\map\map_Objects.csv'),
-            'entities': import_csv_layout(r'C:\Users\ested\Documents\Programming\Python_Games\Zelda2D\map\map_Entities.csv')
+            'boundary': import_csv_layout('Zelda2D\map\map_FloorBlocks.csv'),
+            'grass': import_csv_layout('Zelda2D\map\map_Grass.csv'),
+            'object': import_csv_layout('Zelda2D\map\map_Objects.csv'),
+            'entities': import_csv_layout('Zelda2D\map\map_Entities.csv')
         }
         graphics = {
-            'grass': import_folder(r'C:\Users\ested\Documents\Programming\Python_Games\Zelda2D\assets\graphics\grass'),
-            'objects': import_folder(r'C:\Users\ested\Documents\Programming\Python_Games\Zelda2D\assets\graphics\objects')
+            'grass': import_folder('Zelda2D/assets/graphics/grass'),
+            'objects': import_folder('Zelda2D/assets/graphics/objects')
         }
 
         for style,layout in layouts.items():
@@ -56,17 +57,17 @@ class Level:
                             random_grass_image = choice(graphics['grass'])
                             Tile(
                                 (x,y),
-                                [self.visible_sprites,self.obstacle_sprites,self.attackable_sprites],
+                                [self.visible_sprites,self.obstacle_sprites],
                                 'grass',
                                 random_grass_image)
 
-                        elif style == 'object' and (col != '2' and col != '3' and col != '4' and col != '5' and col != '6' and col != '7'):
-                            surf = graphics['objects'][int(col)]
-                            Tile((x,y),[self.visible_sprites,self.obstacle_sprites],'object',surf)
-                        
-                        elif style == 'object' and (col == '2' or col == '3' or col == '4' or col == '5' or col == '6' or col == '7'):
-                            surf = graphics['objects'][int(col)]
-                            Tile((x,y),[self.visible_sprites,self.obstacle_sprites, self.attackable_sprites],'tree',surf)
+                        elif style == 'object':
+                            if col != '2' and col != '3' and col != '4' and col != '5' and col != '6' and col != '7':
+                                surf = graphics['objects'][int(col)]
+                                Tile((x,y),[self.visible_sprites,self.obstacle_sprites],'object',surf)
+                            elif col == '2' or col == '3' or col == '4' or col == '5' or col == '6' or col == '7':
+                                surf = graphics['objects'][int(col)]
+                                Tree((x,y),[self.visible_sprites,self.obstacle_sprites, self.attackable_sprites], surf)
                         
                         elif style == 'entities':
                             if col == '394':
@@ -100,10 +101,22 @@ class Level:
         if self.current_attack:
             self.current_attack.kill()
             self.current_attack = None
+    
+    def check_tree_attack(self):
+        if self.current_attack:
+            for tree in self.attackable_sprites.sprites():
+                if self.current_attack.rect.colliderect(tree.rect) and tree.current_attack != self.current_attack:
+                    tree.health -= 1
+                    tree.current_attack = self.current_attack
+                    if tree.health <= 0:
+                        tree.kill()
+                        self.player.health += 5
+                        self.player.health = 100 if self.player.health >= 100 else self.player.health
 
     def run(self):
         self.visible_sprites.custom_draw(self.display_surface, self.player)
         self.visible_sprites.update()
+        self.check_tree_attack()
         self.ui.display(self.player)
         self.clock.tick(FPS)
 
@@ -112,7 +125,7 @@ class YSortCameraGroup(pygame.sprite.Group):
         super().__init__()
         self.offset = pygame.math.Vector2()
 
-        self.ground_surface = pygame.image.load(r'C:\Users\ested\Documents\Programming\Python_Games\Zelda2D\assets\graphics\tilemap\ground.png')
+        self.ground_surface = pygame.image.load('Zelda2D/assets/graphics/tilemap/ground.png')
         self.ground_rect = self.ground_surface.get_rect(topleft = (0, 0))
     
     def custom_draw(self, display_surface, player):

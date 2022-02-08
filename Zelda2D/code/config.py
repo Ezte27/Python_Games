@@ -11,6 +11,7 @@ HITBOX_OFFSET = {
 	'invisible': 0,
     'tree': -55
     }
+TREE_HEALTH = 3
 
 # ui 
 BAR_HEIGHT = 20
