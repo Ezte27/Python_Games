@@ -59,19 +59,19 @@ class Player(pygame.sprite.Sprite):
             keys_pressed = pygame.key.get_pressed()
 
             #Movement Input
-            if keys_pressed[pygame.K_w]:
+            if keys_pressed[pygame.K_w] or keys_pressed[pygame.K_UP]:
                 self.direction.y = -1
                 self.status = 'up'
-            elif keys_pressed[pygame.K_s]:
+            elif keys_pressed[pygame.K_s] or keys_pressed[pygame.K_DOWN]:
                 self.direction.y = 1
                 self.status = 'down'
             else:
                 self.direction.y = 0
 
-            if keys_pressed[pygame.K_a]:
+            if keys_pressed[pygame.K_a] or keys_pressed[pygame.K_LEFT]:
                 self.direction.x = -1
                 self.status = 'left'
-            elif keys_pressed[pygame.K_d]:
+            elif keys_pressed[pygame.K_d] or keys_pressed[pygame.K_RIGHT]:
                 self.direction.x = 1
                 self.status = 'right'
             else:
