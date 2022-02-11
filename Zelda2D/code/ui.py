@@ -43,6 +43,7 @@ class UI:
         else:
             pygame.draw.rect(self.display_surface, UI_BORDER_COLOR, bg_rect, 3)
         weapon_surf = pygame.image.load(weapon_data[weapon]['graphic']).convert_alpha()
+        weapon_surf = pygame.transform.scale(weapon_surf, (64, 64)) if weapon == 'fist' else weapon_surf
         weapon_rect = weapon_surf.get_rect(center = bg_rect.center)
         self.display_surface.blit(weapon_surf, weapon_rect)
 

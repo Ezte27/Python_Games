@@ -1,5 +1,5 @@
 import pygame
-from weapon import Weapon
+from attack import Weapon, Fist
 from config import *
 from tile import Tile
 from player import Player
@@ -8,6 +8,8 @@ from support import import_csv_layout, import_folder
 from random import choice
 from ui import UI
 from tree import Tree
+from enemy import Enemy
+from upgrade_menu import Upgrade_menu
 
 class Level:
     def __init__(self):
@@ -24,9 +26,11 @@ class Level:
 
         self.clock = pygame.time.Clock()
 
-        self.ui = UI()
-
         self.create_map()
+
+        self.ui = UI()
+        self.upgrade_menu = Upgrade_menu(self.player)
+        self.game_paused = False
     
     def create_map(self):
         layouts = {
@@ -44,7 +48,6 @@ class Level:
             for row_index,row in enumerate(layout):
                 for col_index, col in enumerate(row):
                     if col != '-1':
-                        #print(col)
                         x = col_index * TILESIZE
                         y = row_index * TILESIZE
                         if style == 'boundary':
@@ -57,7 +60,7 @@ class Level:
                             random_grass_image = choice(graphics['grass'])
                             Tile(
                                 (x,y),
-                                [self.visible_sprites,self.obstacle_sprites],
+                                [self.visible_sprites,self.attackable_sprites,self.obstacle_sprites],
                                 'grass',
                                 random_grass_image)
 
@@ -79,46 +82,64 @@ class Level:
                                     self.destroy_attack)
                                     # self.create_magic)
                             else:
-                                pass
-                            # else:
-                            # 	if col == '390': monster_name = 'bamboo'
-                            # 	elif col == '391': monster_name = 'spirit'
-                            # 	elif col == '392': monster_name ='raccoon'
-                            # 	else: monster_name = 'squid'
-                            # 	Enemy(
-                            # 		monster_name,
-                            # 		(x,y),
-                            # 		[self.visible_sprites,self.attackable_sprites],
-                            # 		self.obstacle_sprites,
-                            # 		self.damage_player,
-                            # 		self.trigger_death_particles,
-                            # 		self.add_exp)
+                                if col == '390': monster_name   = 'bamboo'
+                                elif col == '391': monster_name = 'spirit'
+                                elif col == '392': monster_name = 'raccoon'
+                                else: monster_name              = 'squid'
+                                Enemy(
+                              		monster_name,
+                              		(x,y),
+                              		[self.visible_sprites,self.attackable_sprites],
+                              		self.obstacle_sprites,
+                              		self.damage_player,
+                              		self.add_exp)
 
-    def create_attack(self):
-        self.current_attack = Weapon(self.player, [self.visible_sprites])
+    def create_attack(self, attack_type):
+        if attack_type == 'weapon':
+            self.current_attack = Weapon(self.player, [self.visible_sprites, self.attack_sprites])
+        else:
+            self.current_attack = Fist(self.player, [self.attack_sprites])
 
     def destroy_attack(self):
         if self.current_attack:
             self.current_attack.kill()
             self.current_attack = None
     
-    def check_tree_attack(self):
-        if self.current_attack:
-            for tree in self.attackable_sprites.sprites():
-                if self.current_attack.rect.colliderect(tree.rect) and tree.current_attack != self.current_attack:
-                    tree.health -= 1
-                    tree.current_attack = self.current_attack
-                    if tree.health <= 0:
-                        tree.kill()
-                        self.player.health += 5
-                        self.player.health = 100 if self.player.health >= 100 else self.player.health
+    def player_attack_logic(self):
+        if self.attack_sprites:
+            for attack_sprite in self.attack_sprites:
+                collision_sprites = pygame.sprite.spritecollide(attack_sprite, self.attackable_sprites, False)
+                if collision_sprites:
+                    for target_sprite in collision_sprites:
+                        if target_sprite.sprite_type == 'grass':
+                            target_sprite.kill()
+                        elif target_sprite.sprite_type == 'tree':
+                            target_sprite.chop(self.player.get_full_weapon_damage(), self.current_attack)
+                        else:
+                            target_sprite.get_damage(self.player, attack_sprite.sprite_type)
+
+    def damage_player(self, amount, attack_type = None):
+        if self.player.vulnerable:
+            self.player.health -= amount
+            self.player.vulnerable = False
+            self.player.hurt_time = pygame.time.get_ticks()
+    
+    def toggle_menu(self):
+        self.game_paused = not self.game_paused
 
     def run(self):
         self.visible_sprites.custom_draw(self.display_surface, self.player)
-        self.visible_sprites.update()
-        self.check_tree_attack()
         self.ui.display(self.player)
-        self.clock.tick(FPS)
+        if self.game_paused:
+            self.upgrade_menu.display()
+        else:
+            self.visible_sprites.update()
+            self.visible_sprites.enemy_update(self.player)
+            self.player_attack_logic()
+            self.clock.tick(FPS)
+    
+    def add_exp(self, amount):
+        self.player.exp += amount
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
@@ -138,3 +159,8 @@ class YSortCameraGroup(pygame.sprite.Group):
         for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
             display_surface.blit(sprite.image, offset_pos)
+    
+    def enemy_update(self, player):
+        enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy']
+        for enemy in enemy_sprites:
+            enemy.enemy_update(player)
