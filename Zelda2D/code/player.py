@@ -41,7 +41,7 @@ class Player(Entity):
             'health': 100,
             'energy': 100,
             'attack': 100,
-            'speed': 60
+            'speed': 120
         }
         self.health = self.stats['health'] * 0.5
         self.energy = self.stats['energy']
