@@ -24,10 +24,10 @@ class Level:
     
     def create_map(self):
         layouts = {
-            'boundary': import_csv_layout('2D_Racing_Game\map\map_border_layer.csv'),
             'ground': import_csv_layout('2D_Racing_Game\map\map_ground_layer.csv'),
             'race_tracks': import_csv_layout('2D_Racing_Game\map\map_race_track_layer.csv'),
-            'entities': import_csv_layout('2D_Racing_Game\map\map_entities_layer.csv')
+            'entities': import_csv_layout('2D_Racing_Game\map\map_entities_layer.csv'),
+            'boundary': import_csv_layout('2D_Racing_Game\map\map_border_layer.csv')
         }
 
         for style,layout in layouts.items():
