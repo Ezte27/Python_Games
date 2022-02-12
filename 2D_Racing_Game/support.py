@@ -14,4 +14,5 @@ def get_sprite(path, x, y, width, height):
 	spriteSheet = pygame.image.load(path).convert_alpha()
 	sprite = pygame.Surface([width, height])
 	sprite.blit(spriteSheet, (0,0), (x, y, width, width))
+	sprite.set_colorkey((0, 0, 0))
 	return sprite

@@ -12,7 +12,7 @@ class Level:
 
         self.display_surface = pygame.display.get_surface()
 
-        self.visible_sprites = pygame.sprite.Group()
+        self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = pygame.sprite.Group()
 
         self.clock = pygame.time.Clock()
@@ -33,7 +33,7 @@ class Level:
         for style,layout in layouts.items():
             for row_index,row in enumerate(layout):
                 for col_index, col in enumerate(row):
-                    if col != '':
+                    if col != '' and col != '0':
                         x = col_index * TILESIZE
                         y = row_index * TILESIZE
                         if style == 'boundary':
@@ -44,7 +44,7 @@ class Level:
                                 )
                         elif style == 'ground':
                             ground_sprite_pos = ((int(col) - 49) * TILESIZE, 0)
-                            sprite = get_sprite('2D_Racing_Game/graphics/Road_01/Road_01_tileset.png', ground_sprite_pos[0], ground_sprite_pos[1], TILESIZE, TILESIZE)
+                            sprite = get_sprite('2D_Racing_Game/graphics/Background_Tiles/ground_tileset.png', ground_sprite_pos[0], ground_sprite_pos[1], TILESIZE, TILESIZE)
                             Tile(
                                 (x,y),
                                 [self.visible_sprites],
@@ -52,24 +52,16 @@ class Level:
                                 sprite)
 
                         elif style == 'race_tracks':
-                            if int(col) - 1 <= 7:
-                                road_track_sprite_pos_y = 0
-                            elif 7 < int(col) - 1 <= 15:
-                                road_track_sprite_pos_y = 1
-                            elif 15 < int(col) - 1 <= 23:
-                                road_track_sprite_pos_y = 2
-                            elif 23 < int(col) - 1 <= 31:
-                                road_track_sprite_pos_y = 3
-                            elif 31 < int(col) - 1 <= 39:
-                                road_track_sprite_pos_y = 4
-                            elif 39 < int(col) - 1 <= 47:
-                                road_track_sprite_pos_y = 5
-                            else:
-                                print('ERROR! -- Location = file: level.py / line: 81')
-                                print('Road_Track_Sprite y_pos NOT-FOUND')
-                                print('----------------------------------------------')
-                                pygame.quit()
-                            road_track_sprite_pos = ((int(col) - 1) * TILESIZE, road_track_sprite_pos_y)
+                            track_id = int(col)
+                            road_01_x = 0
+                            road_01_y = 0
+                            for road_row_index, road_row in enumerate(ROAD_TRACKS_01_POSITIONS):
+                                for road_col_index, road_col in enumerate(road_row):
+                                    if track_id == road_col:
+                                        road_01_x = road_col_index
+                                        road_01_y = road_row_index
+                                        break
+                            road_track_sprite_pos = (road_01_x * TILESIZE, road_01_y * TILESIZE)
                             sprite = get_sprite('2D_Racing_Game/graphics/Road_01/Road_01_tileset.png', road_track_sprite_pos[0], road_track_sprite_pos[1], TILESIZE, TILESIZE)
                             Tile(
                                 (x,y),
@@ -84,6 +76,25 @@ class Level:
                                     [self.visible_sprites],
                                     self.obstacle_sprites)
     def run(self):
-        self.visible_sprites.draw(self.display_surface)
+        self.visible_sprites.custom_draw(self.display_surface, self.player)
         self.visible_sprites.update()
         self.clock.tick(FPS)
+
+class YSortCameraGroup(pygame.sprite.Group):
+    def __init__(self):
+        super().__init__()
+        self.offset = pygame.math.Vector2()
+
+        # self.ground_surface = pygame.image.load('Zelda2D/assets/graphics/tilemap/ground.png')
+        # self.ground_rect = self.ground_surface.get_rect(topleft = (0, 0))
+    
+    def custom_draw(self, display_surface, player):
+        self.offset.x  = player.rect.centerx - WIDTH//2
+        self.offset.y  = player.rect.centery - HEIGHT//2
+
+        # self.ground_offset = self.ground_rect.topleft - self.offset
+        # display_surface.blit(self.ground_surface, self.ground_offset)
+
+        for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
+            offset_pos = sprite.rect.topleft - self.offset
+            display_surface.blit(sprite.image, offset_pos)
