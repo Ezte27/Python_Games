@@ -1,0 +1,14 @@
+{ "columns":3,
+ "image":"..\/graphics\/Background_Tiles\/ground_tileset.png",
+ "imageheight":64,
+ "imagewidth":192,
+ "margin":0,
+ "name":"Ground_Tileset",
+ "spacing":0,
+ "tilecount":3,
+ "tiledversion":"1.7.2",
+ "tileheight":64,
+ "tilewidth":64,
+ "type":"tileset",
+ "version":"1.6"
+}

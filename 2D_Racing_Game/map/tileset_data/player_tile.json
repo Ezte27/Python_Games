@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/graphics\/Cars\/yellow_car.png",
+ "imageheight":64,
+ "imagewidth":128,
+ "margin":0,
+ "name":"player_tile",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.7.2",
+ "tileheight":64,
+ "tilewidth":128,
+ "type":"tileset",
+ "version":"1.6"
+}
