@@ -7,4 +7,9 @@ class Tile(pygame.sprite.Sprite):
         self.sprite_type = sprite_type
         self.image = surface
         self.rect  = self.image.get_rect(topleft = pos)
-    
+        if self.sprite_type == 'boundary':
+            self._layer = 1
+        elif self.sprite_type == 'ground':
+            self._layer = 2
+        elif self.sprite_type == 'tracks':
+            self._layer = 3

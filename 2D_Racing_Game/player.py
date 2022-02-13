@@ -6,6 +6,8 @@ class Player(pygame.sprite.Sprite):
         super().__init__(groups)
         self.image = pygame.image.load('2D_Racing_Game\graphics\Cars\yellow_car.png').convert_alpha()
         self.rect  = self.image.get_rect(topleft = pos)
+        self.rect = self.rect.inflate(HITBOX_OFFSET[0], HITBOX_OFFSET[1])
+        self._layer = 4
 
         self.status = 'down'
         self.speed = PLAYER_SPEED

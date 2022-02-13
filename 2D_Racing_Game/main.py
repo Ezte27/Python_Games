@@ -11,7 +11,6 @@ class Game:
         self.level1 = Level()
     
     def run(self):
-        offset = pygame.math.Vector2()
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
