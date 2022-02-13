@@ -1,3 +1,4 @@
+import math
 import pygame
 from settings import *
 
@@ -9,31 +10,31 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.rect.inflate(HITBOX_OFFSET[0], HITBOX_OFFSET[1])
         self._layer = 4
 
-        self.status = 'down'
-        self.speed = PLAYER_SPEED
-
         self.obstacles = obstacles
+
+        # movement
+
+        #self.status = 'down'
+        self.speed = PLAYER_SPEED
         self.direction = pygame.math.Vector2()
-    
+           
     def input(self):
         keys_pressed = pygame.key.get_pressed()
 
         #Movement Input
         if keys_pressed[pygame.K_w] or keys_pressed[pygame.K_UP]:
             self.direction.y = -1
-            self.status = 'up'
         elif keys_pressed[pygame.K_s] or keys_pressed[pygame.K_DOWN]:
             self.direction.y = 1
-            self.status = 'down'
         else:
             self.direction.y = 0
 
         if keys_pressed[pygame.K_a] or keys_pressed[pygame.K_LEFT]:
             self.direction.x = -1
-            self.status = 'left'
+
         elif keys_pressed[pygame.K_d] or keys_pressed[pygame.K_RIGHT]:
             self.direction.x = 1
-            self.status = 'right'
+
         else:
             self.direction.x = 0
     
@@ -63,18 +64,7 @@ class Player(pygame.sprite.Sprite):
                         self.rect.top = sprite.rect.bottom
     
     def animate_player(self):
-        animation = self.animations[self.status]
-        self.frame_index += self.animation_speed
-        if self.frame_index >= len(animation):
-            self.frame_index = 0
-        self.image = animation[int(self.frame_index)]
-        self.rect = self.image.get_rect(center = self.hitbox.center)
-        # flicker when hit
-        if not self.vulnerable:
-            value = self.wave_value()
-            self.image.set_alpha(value)
-        else:
-            self.image.set_alpha(255)
+        pass
     
     def update(self):
         self.input()
