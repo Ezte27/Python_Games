@@ -105,10 +105,10 @@ class Player(Entity):
                 self.create_attack('weapon' if self.weapon != 'fist' else 'fist')
             
             #Magic Input
-            if keys_pressed[pygame.K_m]:
-                self.attacking = True
-                self.attack_time = pygame.time.get_ticks()
-                print('Magic')
+            # if keys_pressed[pygame.K_m]:
+            #     self.attacking = True
+            #     self.attack_time = pygame.time.get_ticks()
+            #     print('Magic')
     
     def animate_player(self):
         animation = self.animations[self.status]
