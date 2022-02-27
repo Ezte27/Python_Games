@@ -14,9 +14,11 @@ class Player(pygame.sprite.Sprite):
 
         # movement
 
-        #self.status = 'down'
-        self.speed = PLAYER_SPEED
+        self.max_speed = PLAYER_SPEED
+        self.velocity = 0
+        self.acceleration = 0
         self.direction = pygame.math.Vector2()
+        
            
     def input(self):
         keys_pressed = pygame.key.get_pressed()
