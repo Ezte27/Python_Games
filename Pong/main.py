@@ -17,6 +17,11 @@ PINK = (200, 100, 60)
 BLUE = (50, 50, 220)
 GRAY = (200, 200, 200)
 
+SCORE_FONT = pygame.font.SysFont('ariel', 50)
+GAME_FONT = pygame.font.SysFont('consolas', 50)
+print(pygame.font.get_fonts())
+RIGHT_COLOR = PINK
+LEFT_COLOR = BLUE
 
 class Paddle:
     def __init__(self, x, y, width, height, color):
@@ -78,8 +83,14 @@ def handle_collisions(ball, left_paddle, right_paddle):
                 ball.y_vel = y_vel * -1
 
 
-def draw(win, paddles, ball):
+def draw(win, paddles, ball, left_score, right_score):
     win.fill(BLACK)
+
+    left_score_text = SCORE_FONT.render(f'{left_score}', True, WHITE)
+    right_score_text = SCORE_FONT.render(f'{right_score}', True, WHITE)
+    win.blit(left_score_text, (WIDTH//4 - left_score_text.get_width()//2, 20))
+    win.blit(right_score_text, (WIDTH * (3/4) - right_score_text.get_width()//2, 20))
+    
     for paddle in paddles:
         paddle.draw(win)
     
@@ -106,8 +117,8 @@ def main():
     run = True
     clock = pygame.time.Clock()
 
-    left_paddle = Paddle(10, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT, BLUE)
-    right_paddle = Paddle(WIDTH - 10 - PADDLE_WIDTH, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT, PINK)
+    left_paddle = Paddle(10, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT, LEFT_COLOR)
+    right_paddle = Paddle(WIDTH - 10 - PADDLE_WIDTH, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT, RIGHT_COLOR)
     ball = Ball(WIDTH//2, HEIGHT//2, BALL_RADIUS, GRAY)
 
     left_player_score = 0
@@ -115,7 +126,7 @@ def main():
 
     while run:
         clock.tick(FPS)
-        draw(WIN, [left_paddle, right_paddle], ball)
+        draw(WIN, [left_paddle, right_paddle], ball, left_player_score, right_player_score)
         keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():
@@ -127,18 +138,35 @@ def main():
         handle_collisions(ball, left_paddle, right_paddle)
         ball.move()
 
+        if right_player_score >= 5:
+            time.sleep(1)
+            WIN.fill(BLACK)
+            win_text = GAME_FONT.render(f'RIGHT PLAYER WON!!', True, RIGHT_COLOR)
+            WIN.blit(win_text, (WIDTH//2 - win_text.get_width()//2, HEIGHT//2))
+            pygame.display.update()
+            time.sleep(4)
+            run = False
+        elif left_player_score >= 5:
+            time.sleep(1)
+            WIN.fill(BLACK)
+            win_text = GAME_FONT.render(f'LEFT PLAYER WON!!', True, LEFT_COLOR)
+            WIN.blit(win_text, (WIDTH//2 - win_text.get_width()//2, HEIGHT//2))
+            pygame.display.update()
+            time.sleep(4)
+            run = False
+        
         if ball.x < 0:
             right_player_score += 1
             ball = Ball(WIDTH//2, HEIGHT//2, BALL_RADIUS, GRAY)
             left_paddle.x, left_paddle.y = (10, HEIGHT//2 - PADDLE_HEIGHT//2)
             right_paddle.x, right_paddle.y = (WIDTH - 10 - PADDLE_WIDTH, HEIGHT//2 - PADDLE_HEIGHT//2)
-            time.sleep(2)
+            time.sleep(.8)
         elif ball.x > WIDTH:
             left_player_score += 1
             ball = Ball(WIDTH//2, HEIGHT//2, BALL_RADIUS, GRAY,max_vel=-5)
             left_paddle.x, left_paddle.y = (10, HEIGHT//2 - PADDLE_HEIGHT//2)
             right_paddle.x, right_paddle.y = (WIDTH - 10 - PADDLE_WIDTH, HEIGHT//2 - PADDLE_HEIGHT//2)
-            time.sleep(2)
+            time.sleep(.8)
 
     pygame.quit()
 
