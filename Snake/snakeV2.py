@@ -23,28 +23,41 @@ FPS = 60
 
 class FRUIT():
     def __init__(self):
+        self.image = pygame.image.load('Snake/img/apple.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (cell_size, cell_size))
+        self.rect = self.image.get_rect()
         self.randomize()
+        self.rect.x, self.rect.y = (self.x_pos * cell_size, self.y_pos * cell_size)
 
     def draw_fruit(self):
-        fruit_rect = pygame.Rect(int(self.pos.x * cell_size), int(self.pos.y * cell_size), cell_size, cell_size)
-        #screen.blit(apple, fruit_rect)
-        pygame.draw.rect(screen, RED, fruit_rect)
+        screen.blit(self.image, self.rect)
     
     def randomize(self):
         self.x_pos = random.randint(0, cell_number - 1)
         self.y_pos = random.randint(0, cell_number - 1)
-        self.pos = Vector2(self.x_pos, self.y_pos)
+        self.pos = (self.x_pos, self.y_pos)
 
 class SNAKE():
     def __init__(self):
         self.original_body = [Vector2(10,10), Vector2(10, 11)]
         self.body = self.original_body
         self.direction = Vector2(1,0)
+        self.animation_index = cell_size
+        self.animation_speed = .1
 
     def draw_snake(self):
+        self.animate_snake()
+        # for block in self.body:
+        #     block_rect = pygame.Rect(int(block.x * cell_size), int(block.y * cell_size), cell_size, cell_size)
+        #     pygame.draw.rect(screen, BLUE, block_rect)
+    
+    def animate_snake(self):
+        self.animation_index -= self.animation_speed
         for block in self.body:
-            block_rect = pygame.Rect(int(block.x * cell_size), int(block.y * cell_size), cell_size, cell_size)
+            block_rect = pygame.Rect(int(block.x * (cell_size)), int(block.y * (cell_size)), cell_size, cell_size)
             pygame.draw.rect(screen, BLUE, block_rect)
+        if self.animation_index <= 0:
+            self.animation_index = cell_size
 
     def move_snake(self):
         body_copy = self.body[:-1]
@@ -72,9 +85,9 @@ class MAIN:
             self.game_over()
         else:
             self.draw_grass()
-            self.draw_score()
             self.fruit.draw_fruit()
             self.snake.draw_snake()
+            self.draw_score()
     
     def check_collision(self):
         if self.fruit.pos == self.snake.body[0]:
@@ -188,8 +201,8 @@ pygame.init()
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.display.set_caption('Snake Game')
 clock = pygame.time.Clock()
-game_font = pygame.font.Font(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\fonts\Roboto-Medium.ttf', 25)
-game_over_font = pygame.font.Font(r'C:\Users\esteb\OneDrive\Documents\Programming\pygameProjects\OSRS_python\fonts\Roboto-Medium.ttf', 60)
+game_font = pygame.font.Font('OSRS_python/Gamefonts/Roboto-Medium.ttf', 25)
+game_over_font = pygame.font.Font('OSRS_python/Gamefonts/Roboto-Medium.ttf', 60)
 button1 = Button('EXIT', 180, 40, (WIN_WIDTH/2 + 20, WIN_HEIGHT/2), RED, 14, (255, 165, 10), BLACK, 'quit')
 button2 = Button('PLAY AGAIN', 180, 40, (WIN_WIDTH/2 - 200, WIN_HEIGHT/2), (20, 250, 30), 14, BLUE, BLACK, 'playagain')
 
@@ -207,16 +220,17 @@ while True:
             if event.type == SCREEN_UPDATE:
                 main_game.update()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_UP] or keys[pygame.K_w]:
                     if main_game.snake.direction.y != 1:
                         main_game.snake.direction = Vector2(0, -1)
-                elif event.key == pygame.K_DOWN:
+                elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
                     if main_game.snake.direction.y != -1:
                         main_game.snake.direction = Vector2(0, 1)
-                elif event.key == pygame.K_RIGHT:
+                elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
                     if main_game.snake.direction.x != -1:
                         main_game.snake.direction = Vector2(1, 0)
-                elif event.key == pygame.K_LEFT:
+                elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
                     if main_game.snake.direction.x != 1:
                         main_game.snake.direction = Vector2(-1, 0)
 
