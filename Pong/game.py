@@ -13,6 +13,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.win = win
         self.ai = ai
+        self.show = self.ai
 
         self.left_paddle = Paddle(10, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT, PINK)
         self.right_paddle = Paddle(WIDTH - 10 - PADDLE_WIDTH, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT, BLUE)
@@ -55,16 +56,10 @@ class Game:
 
     def draw(self):
         self.win.fill(BLACK)
-        if not self.ai:
-            left_score_text = SCORE_FONT.render(f'{self.left_player_score}', True, WHITE)
-            right_score_text = SCORE_FONT.render(f'{self.right_player_score}', True, WHITE)
-            self.win.blit(left_score_text, (WIDTH//4 - left_score_text.get_width()//2, 20))
-            self.win.blit(right_score_text, (WIDTH * (3/4) - right_score_text.get_width()//2, 20))
-        else:
-            left_hits_text = SCORE_FONT.render(f'{self.left_player_hits}', True, WHITE)
-            right_hits_text = SCORE_FONT.render(f'{self.right_player_hits}', True, WHITE)
-            self.win.blit(left_hits_text, (WIDTH//4 - left_hits_text.get_width()//2, 20))
-            self.win.blit(right_hits_text, (WIDTH * (3/4) - right_hits_text.get_width()//2, 20))
+        left_score_text = SCORE_FONT.render(f'{self.left_player_score}', True, WHITE)
+        right_score_text = SCORE_FONT.render(f'{self.right_player_score}', True, WHITE)
+        self.win.blit(left_score_text, (WIDTH//4 - left_score_text.get_width()//2, 20))
+        self.win.blit(right_score_text, (WIDTH * (3/4) - right_score_text.get_width()//2, 20))
         
         for paddle in self.paddles:
             paddle.draw(self.win)
@@ -100,21 +95,21 @@ class Game:
     
     def check_win(self, player_score):
         if player_score >= 10:
-            time.sleep(1) if not self.ai else None
+            time.sleep(1) if not self.show else None
             self.win.fill(BLACK)
             text = 'RIGHT' if self.right_player_score >= 10 else 'LEFT'
-            if not self.ai:
+            if not self.show:
                 win_text = GAME_FONT.render(f'{text} PLAYER WON!!', True, BLUE)
                 self.win.blit(win_text, (WIDTH//2 - win_text.get_width()//2, HEIGHT//2))
             pygame.display.update()
-            time.sleep(4) if not self.ai else None
+            time.sleep(4) if not self.show else None
             self.running = False
     
     def restart_game(self):
         self.ball.reset()
         self.left_paddle.reset()
         self.right_paddle.reset()
-        time.sleep(.8) if not self.ai else None
+        time.sleep(.8) if not self.show else None
 
     def reset(self):
         self.left_player_score = 0
@@ -129,7 +124,7 @@ class Game:
 
     def loop(self):
         self.clock.tick(FPS)
-        if not self.ai:
+        if not self.show:
             self.draw()  
         self.move_paddle()
         self.handle_collisions()
