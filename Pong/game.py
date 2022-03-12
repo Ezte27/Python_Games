@@ -6,7 +6,7 @@ from paddle import Paddle
 pygame.init()
 SCORE_FONT = pygame.font.SysFont('ariel', 50)
 GAME_FONT = pygame.font.SysFont('consolas', 50)
-
+ 
 class Game:
     def __init__(self, win, ai=False):
         self.running = True
@@ -14,6 +14,7 @@ class Game:
         self.win = win
         self.ai = ai
         self.show = self.ai
+        self.FPS = 60 if not self.ai else 6000
 
         self.left_paddle = Paddle(10, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT, PINK)
         self.right_paddle = Paddle(WIDTH - 10 - PADDLE_WIDTH, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT, BLUE)
@@ -123,7 +124,7 @@ class Game:
         self.right_paddle.reset()
 
     def loop(self):
-        self.clock.tick(FPS)
+        self.clock.tick(self.FPS)
         if not self.show:
             self.draw()  
         self.move_paddle()
