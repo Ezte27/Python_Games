@@ -66,14 +66,17 @@ class PongGame:
             decision2 = output2.index(max(output2))
 
             if decision1 == 0:
-                genome1.fitness -= 0.01
+                #genome1.fitness -= 0.01
+                pass
             elif decision1 == 1:
                 self.game.move_paddle(left=True, up=True)
             elif decision1 == 2:
                 self.game.move_paddle(left=True, up=False)
             
+            #self.game.ai_monster(left=False)
             if decision2 == 0:
-                genome1.fitness -= 0.01
+                #genome1.fitness -= 0.01
+                pass
             elif decision2 == 1:
                 self.game.move_paddle(left=False, up=True)
             elif decision2 == 2:
@@ -88,8 +91,8 @@ class PongGame:
     def calculate_fitness(self, genome1, genome2):
         genome1.fitness += self.game.left_player_hits
         genome2.fitness += self.game.right_player_hits
-        #genome1.fitness -= self.game.left_player_misses
-        #genome2.fitness -= self.game.right_player_misses
+        genome1.fitness -= self.game.left_player_misses * 0.4
+        genome2.fitness -= self.game.right_player_misses * 0.4
 
 def eval_genomes(genomes, config):
     for i, (genome_id1, genome1) in enumerate(genomes):
@@ -98,18 +101,18 @@ def eval_genomes(genomes, config):
         genome1.fitness = 0
         for genome_id2, genome2 in genomes[min(i+1, len(genomes) - 1):]:
             genome2.fitness = 0 if genome2.fitness == None else genome2.fitness
-            game = PongGame(window, ai=True)
+            game = PongGame(window, ai=False)
             game.train_ai(genome1, genome2, config)
 
 def run_neat(config):
-    #population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-47')
-    population = neat.Population(config)
+    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-19')
+    #population = neat.Population(config)
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
-    population.add_reporter(neat.Checkpointer(1))
+    population.add_reporter(neat.Checkpointer(2))
 
-    winner = population.run(eval_genomes, 30)
+    winner = population.run(eval_genomes, 1)
     with open('Python_Games/Pong/best_genome.pickle', 'wb') as f:
         pickle.dump(winner, f)
 

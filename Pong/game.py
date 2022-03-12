@@ -94,6 +94,12 @@ class Game:
         elif left and up == False and self.left_paddle.y + self.left_paddle.height < HEIGHT:
             self.left_paddle.move(up = False)
     
+    def ai_monster(self, left=None):
+        if left:
+            self.left_paddle.y = self.ball.y
+        elif not left:
+            self.right_paddle.y = self.ball.y
+    
     def check_win(self, player_score):
         if player_score >= 10:
             time.sleep(1) if not self.show else None
@@ -127,7 +133,7 @@ class Game:
         self.clock.tick(self.FPS)
         if not self.show:
             self.draw()  
-        self.move_paddle()
+        #self.move_paddle()
         self.handle_collisions()
         self.ball.move()
         self.check_win(self.right_player_score)
