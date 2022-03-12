@@ -69,14 +69,14 @@ class PongGame:
             decision2 = output2.index(max(output2))
 
             if decision1 == 0:
-                genome1.fitness -= 0.05
+                genome1.fitness -= 0.01
             elif decision1 == 1:
                 self.game.move_paddle(left=True, up=True)
             elif decision1 == 2:
                 self.game.move_paddle(left=True, up=False)
             
             if decision2 == 0:
-                genome1.fitness -= 0.05
+                genome1.fitness -= 0.01
             elif decision2 == 1:
                 self.game.move_paddle(left=False, up=True)
             elif decision2 == 2:
