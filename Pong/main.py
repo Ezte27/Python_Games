@@ -32,9 +32,9 @@ class PongGame:
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_w]:
-                self.game.move_paddle(left=True, up=True)
+                self.game.move_paddle(left=False, up=True)
             if keys[pygame.K_s]:
-                self.game.move_paddle(left=True, up=False)
+                self.game.move_paddle(left=False, up=False)
 
             output = net.activate((self.left_paddle.y, self.ball.y, abs(self.left_paddle.x - self.ball.x)))
             decision = output.index(max(output))
@@ -42,9 +42,9 @@ class PongGame:
             if decision == 0:
                 pass
             elif decision == 1:
-                self.game.move_paddle(left=False, up=True)
+                self.game.move_paddle(left=True, up=True)
             elif decision == 2:
-                self.game.move_paddle(left=False, up=False)
+                self.game.move_paddle(left=True, up=False)
             
             self.game.loop()
             
@@ -59,12 +59,9 @@ class PongGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     quit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_s:
-                        self.game.show = True
             
             output1 = net1.activate((self.left_paddle.y, self.ball.y, abs(self.left_paddle.x - self.ball.x)))
-            output2 = net2.activate((self.right_paddle.y, self.ball.y, abs(self.left_paddle.x - self.ball.x)))
+            output2 = net2.activate((self.right_paddle.y, self.ball.y, abs(self.right_paddle.x - self.ball.x)))
             decision1 = output1.index(max(output1))
             decision2 = output2.index(max(output2))
 
