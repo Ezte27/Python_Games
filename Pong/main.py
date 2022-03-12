@@ -36,9 +36,8 @@ class PongGame:
             if keys[pygame.K_s]:
                 self.game.move_paddle(left=False, up=False)
 
-            output = net.activate((self.left_paddle.y, self.ball.y, abs(self.left_paddle.x - self.ball.x)))
-            decision = output.index(max(output))
-
+            output = net.activate((self.left_paddle.y, self.ball.y))
+            decision = output.index(max(output))    
             if decision == 0:
                 pass
             elif decision == 1:
@@ -60,8 +59,8 @@ class PongGame:
                 if event.type == pygame.QUIT:
                     quit()
             
-            output1 = net1.activate((self.left_paddle.y, self.ball.y, abs(self.left_paddle.x - self.ball.x)))
-            output2 = net2.activate((self.right_paddle.y, self.ball.y, abs(self.right_paddle.x - self.ball.x)))
+            output1 = net1.activate((self.left_paddle.y, self.ball.y))
+            output2 = net2.activate((self.right_paddle.y, self.ball.y))
             decision1 = output1.index(max(output1))
             decision2 = output2.index(max(output2))
 
@@ -102,14 +101,14 @@ def eval_genomes(genomes, config):
             game.train_ai(genome1, genome2, config)
 
 def run_neat(config):
-    #population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-49')
+    #population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-47')
     population = neat.Population(config)
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
     population.add_reporter(neat.Checkpointer(1))
 
-    winner = population.run(eval_genomes, 50)
+    winner = population.run(eval_genomes, 1)
     with open('Python_Games/Pong/best_genome.pickle', 'wb') as f:
         pickle.dump(winner, f)
 
@@ -125,5 +124,5 @@ if __name__ == '__main__':
 
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-    run_neat(config)
-    #test_ai(config)
+    #run_neat(config)
+    test_ai(config)

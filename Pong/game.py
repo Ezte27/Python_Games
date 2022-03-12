@@ -91,11 +91,11 @@ class Game:
     def move_paddle(self, left=True, up=None):
         if not left and self.right_paddle.y > 0 and up:
             self.right_paddle.move(up = True)
-        if not left and self.right_paddle.y + self.right_paddle.height < HEIGHT and not up:
+        elif not left and self.right_paddle.y + self.right_paddle.height < HEIGHT and up == False:
             self.right_paddle.move(up = False)
         if left and up and self.left_paddle.y > 0:
             self.left_paddle.move(up = True)
-        if left and not up and self.left_paddle.y + self.left_paddle.height < HEIGHT:
+        elif left and up == False and self.left_paddle.y + self.left_paddle.height < HEIGHT:
             self.left_paddle.move(up = False)
     
     def check_win(self, player_score):

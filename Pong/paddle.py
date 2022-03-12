@@ -18,8 +18,10 @@ class Paddle:
     def move(self, up=True):
         if up:
             self.y -= self.SPEED
-        else:
+        elif not up:
             self.y += self.SPEED
+        else:
+            pass
     
     def reset(self):
         self.x = self.original_x
