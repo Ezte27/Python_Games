@@ -8,6 +8,7 @@ import pygame, random, time
 pygame.init()
 
 SCORE_FONT = pygame.font.SysFont('consolas', 40)
+LEVEL_FONT = pygame.font.SysFont('consolas', 20)
 
 class Main:
     def __init__(self):
@@ -22,7 +23,8 @@ class Main:
         self.clock = pygame.time.Clock()
         self.player_score = 0
         self.player_misses = 0
-        self.player_hits = 0
+
+        self.level = 1
 
     def handle_ball_collisions(self):
         if self.ball.y_vel < 0:
@@ -30,7 +32,7 @@ class Main:
                 if (self.ball.x >= obstacle.x) and (self.ball.x <= obstacle.x + obstacle.width):
                     if self.ball.y - self.ball.radius <= obstacle.y + obstacle.height:
                         self.ball.y_vel *= -1
-                        self.player_hits += 1
+                        self.player_score += 1
                         self.obstacles.remove(obstacle)
                         del obstacle
 
@@ -41,11 +43,11 @@ class Main:
                         #self.ball.x_vel = x_vel * -1
             
             if self.ball.y <= 0:
-                self.restart_game(next_level=True)
+                self.ball.y_vel *= -1
 
         else:
             if (self.ball.x >= self.player.x) and (self.ball.x <= self.player.x + self.player.width):
-                if self.ball.y + self.ball.radius >= self.player.y:
+                if (self.ball.y + self.ball.radius >= self.player.y) and (self.ball.y + self.ball.radius <= self.player.y + self.player.height):
                     self.ball.y_vel *= -1
                     
                     # Some MATHS!
@@ -69,9 +71,11 @@ class Main:
     
     def draw(self):
         player_score_text = SCORE_FONT.render(f'{self.player_score}', True, WHITE)
+        level_text = LEVEL_FONT.render(f'Level: {self.level}', True, GRAY)
 
         self.win.fill(BLACK)
         self.win.blit(player_score_text, (WIDTH//2 - player_score_text.get_width()//2, 20))
+        self.win.blit(level_text, (WIDTH - level_text.get_width() - WIDTH//30 , 20))
 
         self.player.draw(self.win)
         
@@ -90,7 +94,7 @@ class Main:
 
     def restart_game(self, next_level = False):
         if next_level:
-            self.player_score += 1
+            self.level += 1
             self.obstacles = []
             self.create_obtacles()
             self.ball.reset()
@@ -106,11 +110,14 @@ class Main:
     def reset(self):
         self.player_score = 0
         self.player_hits = 0
-        self.player_misses = 0
         self.obstacles = []
         self.create_obtacles()
         self.ball.reset()
         self.player.reset()
+    
+    def check_win(self):
+        if len(self.obstacles) == 0:
+            self.restart_game(next_level=True)
 
     def game_loop(self):
         self.clock.tick(FPS)
