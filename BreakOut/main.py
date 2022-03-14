@@ -35,17 +35,11 @@ class Main:
                         self.player_score += 1
                         self.obstacles.remove(obstacle)
                         del obstacle
-
-                        # middle_x = obstacle.x + self.player.width/2
-                        # difference_in_x = middle_x - self.ball.x
-                        # reduction_factor = (self.player.width/2) / self.ball.max_vel
-                        # x_vel = difference_in_x / reduction_factor
-                        #self.ball.x_vel = x_vel * -1
             
-            if self.ball.y <= 0:
+            if self.ball.y - self.ball.radius <= 0:
                 self.ball.y_vel *= -1
 
-        else:
+        elif self.ball.y_vel > 0:
             if (self.ball.x >= self.player.x) and (self.ball.x <= self.player.x + self.player.width):
                 if (self.ball.y + self.ball.radius >= self.player.y) and (self.ball.y + self.ball.radius <= self.player.y + self.player.height):
                     self.ball.y_vel *= -1
@@ -56,8 +50,36 @@ class Main:
                     reduction_factor = (self.player.width/2) / self.ball.max_vel
                     x_vel = difference_in_x / reduction_factor
                     self.ball.x_vel = x_vel * -1
-            elif self.ball.y >= HEIGHT:
+
+            if self.ball.y >= HEIGHT:
                 self.restart_game()
+            
+            # for obstacle in self.obstacles:
+            #     if (self.ball.x >= obstacle.x) and (self.ball.x + self.ball.radius <= obstacle.x + obstacle.width):
+            #         if self.ball.y + self.ball.radius >= obstacle.y:
+            #             self.ball.y_vel *= -1
+            #             self.player_score += 1
+            #             self.obstacles.remove(obstacle)
+            #             del obstacle
+            
+        # if self.ball.x_vel > 0:
+        #     for obstacle in self.obstacles:
+        #         if (self.ball.y - self.ball.radius >= obstacle.y) and (self.ball.y + self.ball.radius <= obstacle.y + obstacle.height):
+        #             if self.ball.x + self.ball.radius >= obstacle.x:
+        #                 self.ball.x_vel *= -1
+        #                 self.player_score += 1
+        #                 self.obstacles.remove(obstacle)
+        #                 del obstacle
+        
+        # elif self.ball.x_vel < 0:
+        #     for obstacle in self.obstacles:
+        #         if (self.ball.y - self.ball.radius >= obstacle.y) and (self.ball.y + self.ball.radius <= obstacle.y + obstacle.height):
+        #             if self.ball.x - self.ball.radius <= obstacle.x:
+        #                 self.ball.x_vel *= -1
+        #                 self.player_score += 1
+        #                 self.obstacles.remove(obstacle)
+        #                 del obstacle
+
 
     def create_obtacles(self):
         for row in range(random.randint(2, 4)):
