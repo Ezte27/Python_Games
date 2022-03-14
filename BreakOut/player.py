@@ -9,7 +9,7 @@ class Player:
         self.color = color
         self.SPEED = speed
     
-    def move(self, right):
+    def move(self, right = None):
         if right:
             self.x += self.SPEED
         elif not right:

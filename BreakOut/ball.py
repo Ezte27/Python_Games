@@ -1,4 +1,4 @@
-from settings import HEIGHT
+from settings import WIDTH, MIN_ANGLE, MAX_ANGLE
 
 import pygame, math, random
 
@@ -6,14 +6,16 @@ class Ball:
     def __init__(self, pos, radius, color, max_vel):
         self.original_pos = pos
         self.x, self.y = pos[0], pos[1]
-        self.x_vel = self.y_vel = 0
+        self.angle = self.get_random_angle(MIN_ANGLE, MAX_ANGLE)
+        self.x_vel = abs(math.cos(self.angle) * self.max_vel)
+        self.y_vel = math.sin(self.angle) * self.max_vel
         self.radius = radius
         self.color = color
         self.max_vel = max_vel
     
     def move(self):
-        # if (self.y - self.radius <= 0) or (self.y + self.radius >= HEIGHT):
-        #     self.y_vel *= -1
+        if (self.x <= 0) or (self.x + self.radius >= WIDTH):
+            self.x_vel *= -1
         self.x += self.x_vel
         self.y += self.y_vel
         
@@ -25,6 +27,6 @@ class Ball:
         self.x_vel = abs(math.cos(self.angle) * self.max_vel)
         self.y_vel = math.sin(self.angle) * self.max_vel
     
-    def get_random_angle(self, min_angle, max_angle):
+    def get_random_angle(self, min_angle: int, max_angle: int):
         angle = math.radians(random.randrange(min_angle, max_angle))
         return angle
