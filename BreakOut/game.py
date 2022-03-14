@@ -18,10 +18,6 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
-            
-            if not self.game.running: # Check if player won
-                #self.main_menu()
-                pass
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_a]:
@@ -29,9 +25,10 @@ class Game:
             elif keys[pygame.K_d]:
                 self.game.move_paddle(right = True)
             elif keys[pygame.K_r]:
-                self.game.reset
+                self.game.reset()
             elif keys[pygame.K_q]: # Back to main menu
-                pass
+                run = False
+                self.main_menu()
             elif keys[pygame.K_m]: # Show player or ai stats
                 pass
             
@@ -43,6 +40,9 @@ class Game:
         pass
 
     def show_settings(self):
+        pass
+
+    def show_stats(self):
         pass
 
     def train_ai(self):

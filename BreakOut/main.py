@@ -3,7 +3,7 @@ from player import Player
 from ball import Ball
 from obstacle import Obstacle
 
-import pygame, random
+import pygame, random, time
 
 pygame.init()
 
@@ -23,8 +23,6 @@ class Main:
         self.player_score = 0
         self.player_misses = 0
         self.player_hits = 0
-
-        self.running = True
 
     def handle_ball_collisions(self):
         if self.ball.y_vel < 0:
@@ -57,7 +55,6 @@ class Main:
                     x_vel = difference_in_x / reduction_factor
                     self.ball.x_vel = x_vel * -1
             elif self.ball.y >= HEIGHT:
-                self.player_misses += 1
                 self.restart_game()
 
     def create_obtacles(self):
@@ -94,10 +91,17 @@ class Main:
     def restart_game(self, next_level = False):
         if next_level:
             self.player_score += 1
-            # self.obstacles = []
-            # self.create_obtacles()
+            self.obstacles = []
+            self.create_obtacles()
+            self.ball.reset()
+            self.player.reset()
+            time.sleep(NEXT_LEVEL_DELAY)
+
         else:
-            pass
+            self.player_misses += 1
+            self.ball.reset()
+            self.player.reset()
+            time.sleep(MISSED_THE_BALL_DELAY)
 
     def reset(self):
         self.player_score = 0
