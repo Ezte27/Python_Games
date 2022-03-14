@@ -7,14 +7,14 @@ import pygame, random
 
 pygame.init()
 
-SCORE_FONT = pygame.font.Font('consolas', 40)
+SCORE_FONT = pygame.font.SysFont('consolas', 40)
 
 class Main:
     def __init__(self):
         self.win = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(GAME_TITLE)
 
-        self.player = Player((WIDTH//2, HEIGHT - 10), PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_COLOR, PLAYER_SPEED)
+        self.player = Player((WIDTH//2, HEIGHT - PLAYER_HEIGHT*3), PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_COLOR, PLAYER_SPEED)
         self.ball = Ball((self.player.x, self.player.y - BALL_RADIUS), BALL_RADIUS, BALL_COLOR, BALL_MAX_VEL)
         self.obstacles = []
         self.create_obtacles()
@@ -26,7 +26,7 @@ class Main:
 
         self.running = True
 
-    def handle_collisions(self):
+    def handle_ball_collisions(self):
         if self.ball.y_vel < 0:
             for obstacle in self.obstacles:
                 if (self.ball.x >= obstacle.x) and (self.ball.x <= obstacle.x + obstacle.width):
@@ -65,7 +65,7 @@ class Main:
                 width = WIDTH//col_num
                 height = OBSTACLE_HEIGHT
                 pos = (col, row)
-                color = random.choice(COLORS.remove(BLACK))
+                color = random.choice(OBSTACLE_COLORS)
                 self.obstacles.append(Obstacle(pos, width, height, color))
     
     def draw(self):
@@ -116,5 +116,5 @@ class Main:
         #     self.move_paddle(right = True)
 
         self.draw()  
-        self.handle_collisions()
+        self.handle_ball_collisions()
         self.ball.move() 
