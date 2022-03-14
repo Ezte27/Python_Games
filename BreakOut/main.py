@@ -14,7 +14,7 @@ class Main:
         self.win = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(GAME_TITLE)
 
-        self.player = Player((WIDTH//2, HEIGHT - PLAYER_HEIGHT*3), PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_COLOR, PLAYER_SPEED)
+        self.player = Player((WIDTH//2 - PLAYER_WIDTH//2, HEIGHT - PLAYER_HEIGHT*3), PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_COLOR, PLAYER_SPEED)
         self.ball = Ball((self.player.x, self.player.y - BALL_RADIUS), BALL_RADIUS, BALL_COLOR, BALL_MAX_VEL)
         self.obstacles = []
         self.create_obtacles()
@@ -33,6 +33,8 @@ class Main:
                     if self.ball.y - self.ball.radius <= obstacle.y + obstacle.height:
                         self.ball.y_vel *= -1
                         self.player_hits += 1
+                        self.obstacles.remove(obstacle)
+                        del obstacle
 
                         # middle_x = obstacle.x + self.player.width/2
                         # difference_in_x = middle_x - self.ball.x
@@ -59,12 +61,12 @@ class Main:
                 self.restart_game()
 
     def create_obtacles(self):
-        col_num = random.randint(WIDTH//85, WIDTH//50)
         for row in range(random.randint(2, 4)):
+            col_num = random.randint(WIDTH/80, WIDTH/40)
             for col in range(col_num):
                 width = WIDTH//col_num
                 height = OBSTACLE_HEIGHT
-                pos = (col, row)
+                pos = (col * width, row * height + HEIGHT//8)
                 color = random.choice(OBSTACLE_COLORS)
                 self.obstacles.append(Obstacle(pos, width, height, color))
     

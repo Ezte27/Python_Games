@@ -28,5 +28,5 @@ class Ball:
         self.y_vel = math.sin(self.angle) * self.max_vel
     
     def get_random_angle(self, min_angle: int, max_angle: int):
-        angle = math.radians(random.randrange(min_angle, max_angle))
+        angle = math.radians(random.choice([min_angle, max_angle]))
         return angle
