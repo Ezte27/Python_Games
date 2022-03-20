@@ -16,7 +16,7 @@ class Main:
         pygame.display.set_caption(GAME_TITLE)
 
         self.player = Player((WIDTH//2 - PLAYER_WIDTH//2, HEIGHT - PLAYER_HEIGHT*3), PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_COLOR, PLAYER_SPEED)
-        self.ball = Ball((self.player.x, self.player.y - BALL_RADIUS), BALL_RADIUS, BALL_COLOR, BALL_MAX_VEL)
+        self.ball = Ball((self.player.rect.centerx, self.player.rect.centery - BALL_RADIUS - self.player.height//2), BALL_RADIUS, BALL_COLOR, BALL_MAX_VEL)
         self.obstacles = []
         self.create_obtacles()
 
@@ -27,67 +27,61 @@ class Main:
         self.level = 1
 
     def handle_ball_collisions(self):
-        if self.ball.y_vel < 0:
-            for obstacle in self.obstacles:
-                if (self.ball.x >= obstacle.x) and (self.ball.x <= obstacle.x + obstacle.width):
-                    if self.ball.y - self.ball.radius <= obstacle.y + obstacle.height:
-                        self.ball.y_vel *= -1
-                        self.player_score += 1
-                        self.obstacles.remove(obstacle)
-                        del obstacle
-            
+
+        for obstacle in self.obstacles:
+            if self.ball.rect.colliderect(obstacle.rect):
+                if abs(obstacle.rect.top - self.ball.rect.bottom) < 8:
+                    self.ball.y_vel *= -1
+                    self.player_score += 1
+                    self.obstacles.remove(obstacle)
+                    del obstacle
+                
+                elif abs(obstacle.rect.bottom - self.ball.rect.top) < 8:
+                    self.ball.y_vel *= -1
+                    self.player_score += 1
+                    self.obstacles.remove(obstacle)
+                    del obstacle
+                
+                elif abs(obstacle.rect.left - self.ball.rect.right) < 8:
+                    self.ball.x_vel *= -1
+                    self.player_score += 1
+                    self.obstacles.remove(obstacle)
+                    del obstacle
+                
+                elif abs(obstacle.rect.right - self.ball.rect.left) < 8:
+                    self.ball.x_vel *= -1
+                    self.player_score += 1
+                    self.obstacles.remove(obstacle)
+                    del obstacle
+
+        if self.ball.y_vel < 0: 
             if self.ball.y - self.ball.radius <= 0:
                 self.ball.y_vel *= -1
 
         elif self.ball.y_vel > 0:
-            if (self.ball.x >= self.player.x) and (self.ball.x <= self.player.x + self.player.width):
-                if (self.ball.y + self.ball.radius >= self.player.y) and (self.ball.y + self.ball.radius <= self.player.y + self.player.height):
-                    self.ball.y_vel *= -1
-                    
-                    # Some MATHS!
-                    middle_x = self.player.x + self.player.width/2
-                    difference_in_x = middle_x - self.ball.x
-                    reduction_factor = (self.player.width/2) / self.ball.max_vel
-                    x_vel = difference_in_x / reduction_factor
-                    self.ball.x_vel = x_vel * -1
+            if self.player.rect.colliderect(self.ball.rect):
+                self.ball.y_vel *= -1
+                   
+                # Some MATHS for paddle and ball collision!
+                middle_x = self.player.x + self.player.width/2
+                difference_in_x = middle_x - self.ball.x
+                reduction_factor = (self.player.width/2) / self.ball.max_vel
+                x_vel = difference_in_x / reduction_factor
+                self.ball.x_vel = x_vel * -1
 
             if self.ball.y >= HEIGHT:
                 self.restart_game()
-            
-            # for obstacle in self.obstacles:
-            #     if (self.ball.x >= obstacle.x) and (self.ball.x + self.ball.radius <= obstacle.x + obstacle.width):
-            #         if self.ball.y + self.ball.radius >= obstacle.y:
-            #             self.ball.y_vel *= -1
-            #             self.player_score += 1
-            #             self.obstacles.remove(obstacle)
-            #             del obstacle
-            
-        # if self.ball.x_vel > 0:
-        #     for obstacle in self.obstacles:
-        #         if (self.ball.y - self.ball.radius >= obstacle.y) and (self.ball.y + self.ball.radius <= obstacle.y + obstacle.height):
-        #             if self.ball.x + self.ball.radius >= obstacle.x:
-        #                 self.ball.x_vel *= -1
-        #                 self.player_score += 1
-        #                 self.obstacles.remove(obstacle)
-        #                 del obstacle
-        
-        # elif self.ball.x_vel < 0:
-        #     for obstacle in self.obstacles:
-        #         if (self.ball.y - self.ball.radius >= obstacle.y) and (self.ball.y + self.ball.radius <= obstacle.y + obstacle.height):
-        #             if self.ball.x - self.ball.radius <= obstacle.x:
-        #                 self.ball.x_vel *= -1
-        #                 self.player_score += 1
-        #                 self.obstacles.remove(obstacle)
-        #                 del obstacle
+                
 
 
     def create_obtacles(self):
+        height_offset = random.randint(45, 85)
         for row in range(random.randint(2, 4)):
-            col_num = random.randint(WIDTH/80, WIDTH/40)
+            col_num = random.choice([WIDTH//80, WIDTH//40])
             for col in range(col_num):
                 width = WIDTH//col_num
                 height = OBSTACLE_HEIGHT
-                pos = (col * width, row * height + HEIGHT//8)
+                pos = (col * width, row * height + height_offset)
                 color = random.choice(OBSTACLE_COLORS)
                 self.obstacles.append(Obstacle(pos, width, height, color))
     
@@ -109,9 +103,9 @@ class Main:
         pygame.display.update()
 
     def move_paddle(self, right=None):
-        if not right and self.player.x > 0:
+        if not right and self.player.rect.x > 0:
             self.player.move(right = False)
-        elif right and self.player.x + self.player.width < WIDTH:
+        elif right and self.player.rect.x + self.player.rect.width < WIDTH:
             self.player.move(right = True)
 
     def restart_game(self, next_level = False):

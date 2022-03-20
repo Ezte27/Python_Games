@@ -6,6 +6,7 @@ class Player:
         self.x, self.y = pos[0], pos[1]
         self.width = width
         self.height = height
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.color = color
         self.SPEED = speed
     
@@ -14,9 +15,11 @@ class Player:
             self.x += self.SPEED
         elif not right:
             self.x -= self.SPEED
+        self.rect.x = self.x
         
     def draw(self, win):
         pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
     
     def reset(self):
         self.x, self.y = self.original_pos[0], self.original_pos[1]
+        self.rect.x, self.rect.y = self.x, self.y
