@@ -1,3 +1,4 @@
+from ssl import OP_NO_RENEGOTIATION
 import pygame
 import pymunk
 import pymunk.pygame_util
@@ -48,12 +49,31 @@ def create_structures(space, width, height):
     for pos, size, color, mass in rects:
         body = pymunk.Body(body_type = pymunk.Body.DYNAMIC)
         body.position = pos
-        shape = pymunk.Poly.create_box(body, size)
-        shape.elasticity = 0.2
-        shape.friction = 0.5
+        shape = pymunk.Poly.create_box(body, size, radius= 2)
+        shape.elasticity = 0.4
+        shape.friction = 0.4
         shape.mass = mass
-        shape.color = (20, 20, 20, 97)
+        shape.color = color
         space.add(body, shape)
+
+def create_pendulum(space, width, height):
+    rotation_center_body = pymunk.Body(body_type=pymunk.Body.STATIC)
+    rotation_center_body.position = (300, 300)
+
+    body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
+    body.position = (300, 200)
+
+    line = pymunk.Segment(body, (0, 0), (255, 0), 5)
+    circle = pymunk.Circle(body, 40, (255, 0))
+    rotation_center_joint = pymunk.PinJoint(body, rotation_center_body, (0, 0), (0, 0))
+
+    line.friction = 1
+    circle.friction = 1
+    line.mass = 8
+    circle.mass = 30
+    circle.elasticity = 0.95
+
+    space.add(body, circle, line, rotation_center_joint)
 
 def create_circle(space, radius, mass, pos):
     body = pymunk.Body(body_type = pymunk.Body.STATIC)
@@ -76,6 +96,8 @@ def run(window, width, height):
     space.gravity = (0, 981)
 
     create_boundaries(space, width, height)
+    create_structures(space, width, height)
+    create_pendulum(space, width, height)
 
     draw_options = pymunk.pygame_util.DrawOptions(window)
 
