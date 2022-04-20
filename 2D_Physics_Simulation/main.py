@@ -5,7 +5,7 @@ import pymunk.pygame_util
 import math
 
 pygame.init()
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1000, 600
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 def draw(space, window, draw_options, line):
@@ -41,9 +41,9 @@ def create_boundaries(space, width, height):
 def create_structures(space, width, height):
     BROWN = (139, 69, 19, 100)
     rects = [
-        [(600, height - 120), (40, 200), BROWN, 100],
-        [(900, height - 120), (40, 200), BROWN, 100],
-        [(750, height - 240), (340, 40), BROWN, 150],
+        [(width - 400, height - 120), (40, 200), BROWN, 100],
+        [(width - 100, height - 120), (40, 200), BROWN, 100],
+        [(width - 250, height - 240), (340, 40), BROWN, 150],
     ]
 
     for pos, size, color, mass in rects:
@@ -58,13 +58,13 @@ def create_structures(space, width, height):
 
 def create_pendulum(space, width, height):
     rotation_center_body = pymunk.Body(body_type=pymunk.Body.STATIC)
-    rotation_center_body.position = (300, 300)
+    rotation_center_body.position = (300, 100)
 
     body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
-    body.position = (300, 200)
+    body.position = (300, 300)
 
-    line = pymunk.Segment(body, (0, 0), (255, 0), 5)
-    circle = pymunk.Circle(body, 40, (255, 0))
+    line = pymunk.Segment(body, (0, 0), (200, 0), 5)
+    circle = pymunk.Circle(body, 40, (200, 0))
     rotation_center_joint = pymunk.PinJoint(body, rotation_center_body, (0, 0), (0, 0))
 
     line.friction = 1
