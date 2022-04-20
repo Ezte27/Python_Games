@@ -5,7 +5,7 @@ import pymunk.pygame_util
 import math
 
 pygame.init()
-WIDTH, HEIGHT = 1000, 800
+WIDTH, HEIGHT = 800, 600
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 def draw(space, window, draw_options, line):
