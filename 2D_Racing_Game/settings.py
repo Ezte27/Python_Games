@@ -1,6 +1,6 @@
 #Game Setup
-WIDTH    = 1280
-HEIGHT   = 720
+WIDTH    = 800#1280
+HEIGHT   = 600#720
 FPS      = 40
 TILESIZE = 64
 TITLE    = 'RaceTheCars'
