@@ -1,11 +1,14 @@
 import math
 import pygame
+from pathlib import Path
 from settings import *
+
+car_file_path = Path("graphics\Cars\yellow_car.png").resolve().absolute()
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, obstacles):
         super().__init__(groups)
-        self.image = pygame.image.load('2D_Racing_Game\graphics\Cars\yellow_car.png').convert_alpha()
+        self.image = pygame.image.load(car_file_path).convert_alpha()
         self.rect  = self.image.get_rect(topleft = pos)
         self.rect = self.rect.inflate(HITBOX_OFFSET[0], HITBOX_OFFSET[1])
         self._layer = 4
@@ -43,9 +46,9 @@ class Player(pygame.sprite.Sprite):
     def move(self):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
-        self.rect.x += self.direction.x * self.speed
+        self.rect.x += self.direction.x * self.max_speed
         self.collision('horizontal')
-        self.rect.y += self.direction.y * self.speed
+        self.rect.y += self.direction.y * self.max_speed
         self.collision('vertical')
 
     def collision(self, direction):

@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 from settings import *
 from tile import Tile
 from player import Player
@@ -6,6 +7,14 @@ from support import import_csv_layout, get_sprite
 from random import choice
 #from enemy import Enemy
 #from upgrade_menu import Upgrade_menu
+
+ground_layer_file_path = Path("map\map_ground_layer.csv").resolve().absolute()
+race_track_layer_file_path = Path("map\map_race_track_layer.csv").resolve().absolute()
+entities_layer_file_path = Path("map\map_entities_layer.csv").resolve().absolute()
+border_layer_file_path = Path("map\map_border_layer.csv").resolve().absolute()
+
+ground_tileset_file_path = Path("graphics/Background_Tiles/ground_tileset.png").resolve().absolute()
+road_01_tileset_file_path = Path("graphics/Road_01/Road_01_tileset.png").resolve().absolute()
 
 class Level:
     def __init__(self):
@@ -24,10 +33,10 @@ class Level:
     
     def create_map(self):
         layouts = {
-            'ground': import_csv_layout('2D_Racing_Game\map\map_ground_layer.csv'),
-            'race_tracks': import_csv_layout('2D_Racing_Game\map\map_race_track_layer.csv'),
-            'entities': import_csv_layout('2D_Racing_Game\map\map_entities_layer.csv'),
-            'boundary': import_csv_layout('2D_Racing_Game\map\map_border_layer.csv')
+            'ground': import_csv_layout(ground_layer_file_path),
+            'race_tracks': import_csv_layout(race_track_layer_file_path),
+            'entities': import_csv_layout(entities_layer_file_path),
+            'boundary': import_csv_layout(border_layer_file_path)
         }
 
         for style,layout in layouts.items():
@@ -44,7 +53,7 @@ class Level:
                                 )
                         elif style == 'ground':
                             ground_sprite_pos = ((int(col) - 49) * TILESIZE, 0)
-                            sprite = get_sprite('2D_Racing_Game/graphics/Background_Tiles/ground_tileset.png', ground_sprite_pos[0], ground_sprite_pos[1], TILESIZE, TILESIZE)
+                            sprite = get_sprite(ground_tileset_file_path , ground_sprite_pos[0], ground_sprite_pos[1], TILESIZE, TILESIZE)
                             Tile(
                                 (x,y),
                                 [self.visible_sprites],
@@ -62,7 +71,7 @@ class Level:
                                         road_01_y = road_row_index
                                         break
                             road_track_sprite_pos = (road_01_x * TILESIZE, road_01_y * TILESIZE)
-                            sprite = get_sprite('2D_Racing_Game/graphics/Road_01/Road_01_tileset.png', road_track_sprite_pos[0], road_track_sprite_pos[1], TILESIZE, TILESIZE)
+                            sprite = get_sprite(road_01_tileset_file_path, road_track_sprite_pos[0], road_track_sprite_pos[1], TILESIZE, TILESIZE)
                             Tile(
                                 (x,y),
                                 [self.visible_sprites],
