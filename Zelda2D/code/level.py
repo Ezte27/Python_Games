@@ -10,6 +10,14 @@ from ui import UI
 from tree import Tree
 from enemy import Enemy
 from upgrade_menu import Upgrade_menu
+from pathlib import Path
+
+floorBlocks_file_path = Path("Zelda2D\map\map_FloorBlocks.csv").resolve().absolute()
+grass_file_path = Path('Zelda2D\map\map_Grass.csv').resolve().absolute()
+objects_file_path = Path('Zelda2D\map\map_Objects.csv').resolve().absolute()
+entities_file_path = Path('Zelda2D\map\map_Entities.csv').resolve().absolute()
+grass_folder_path = Path('Zelda2D/assets/graphics/grass').resolve().absolute()
+objects_folder_path = Path('Zelda2D/assets/graphics/objects').resolve().absolute()
 
 class Level:
     def __init__(self):
@@ -34,14 +42,14 @@ class Level:
     
     def create_map(self):
         layouts = {
-            'boundary': import_csv_layout('Zelda2D\map\map_FloorBlocks.csv'),
-            'grass': import_csv_layout('Zelda2D\map\map_Grass.csv'),
-            'object': import_csv_layout('Zelda2D\map\map_Objects.csv'),
-            'entities': import_csv_layout('Zelda2D\map\map_Entities.csv')
+            'boundary': import_csv_layout(floorBlocks_file_path),
+            'grass': import_csv_layout(grass_file_path),
+            'object': import_csv_layout(objects_file_path),
+            'entities': import_csv_layout(entities_file_path)
         }
         graphics = {
-            'grass': import_folder('Zelda2D/assets/graphics/grass'),
-            'objects': import_folder('Zelda2D/assets/graphics/objects')
+            'grass': import_folder(grass_folder_path),
+            'objects': import_folder(objects_folder_path)
         }
 
         for style,layout in layouts.items():
@@ -141,12 +149,14 @@ class Level:
     def add_exp(self, amount):
         self.player.exp += amount
 
+ground_file_path = Path('Zelda2D/assets/graphics/tilemap/ground.png').resolve().absolute()
+
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
         self.offset = pygame.math.Vector2()
 
-        self.ground_surface = pygame.image.load('Zelda2D/assets/graphics/tilemap/ground.png')
+        self.ground_surface = pygame.image.load(ground_file_path)
         self.ground_rect = self.ground_surface.get_rect(topleft = (0, 0))
     
     def custom_draw(self, display_surface, player):
