@@ -1,7 +1,7 @@
 #Game Setup
-WIDTH    = 1280
-HEIGHT   = 720
-FPS      = 40
+WIDTH    = 1280 / 1.3
+HEIGHT   = 720 / 1.3
+FPS      = 60
 TILESIZE = 64
 TITLE    = 'ZELDA 2D'
 HITBOX_OFFSET = {

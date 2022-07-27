@@ -6,7 +6,7 @@
                 "....................BBBBBBBBBBBB                                              ",
                 "....................B......T...B                                              ",
                 "....................B..........B                                              ",
-                "....................B...P......B                                              ",
+                "....................B..........B                                              ",
                 "....................BE.........B                                              ",
                 "....................B..........B                                              ",
                 "....................BTBE.......BBTTTBTB                                       ",
@@ -14,11 +14,11 @@
                 "....................B...T.............B       B...........T......BBBBBB       ",
                 "....................BBBBBBBBBBBB......TBBBBBBBB.BBB.....E....B.........B      ",
                 "....................          B.....E.B..E......BTB.T..A.....BBB....T...BBBBBB",
-                "    BBBBBBBT......B.......B.BTT..c..T......B.T....E......D",
-                "    B...2...T.............TBBBBBBBBBBBBB...BBBTTBBBB.....B",
-                "    BBB....TT.......B......E......BBB........BBBB..1BBBBBB",
-                "   BBT....T.....A.......................BB....E......B    ",
-                "   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB    "
+                "    BBBBBBBT......B.......B.BTT..c..T......B.T....E......D                    ",
+                "    B...2...T.............TBBBBBBBBBBBBB..PBBBTTBBBB.....B                    ",
+                "    BBB....TT.......B......E......BBB........BBBB..1BBBBBB                    ",
+                "   BBT....T.....A.......................BB....E......B                        ",
+                "   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                        "
             ]
         },
         {

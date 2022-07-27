@@ -5,7 +5,7 @@ from config import *
 from sprites import *
 import sys, random, json, time
 
-mapId = 5#int(input('Choose Map: ')) - 1
+mapId = 0#int(input('Choose Map: ')) - 1
 with open('OSRS_python/maps.json', 'r') as f:
     data = json.load(f)
 map = data['maps'][mapId]['TileMap']
