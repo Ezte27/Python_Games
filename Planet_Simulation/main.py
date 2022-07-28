@@ -106,7 +106,6 @@ class Planet:
                 return (planet)
         return False
 
-
 def main(FPS):
     running = True
     clock = pygame.time.Clock()
@@ -140,7 +139,7 @@ def main(FPS):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
                     running = False
@@ -157,7 +156,7 @@ def main(FPS):
                 planets.remove(collision)
 
             if not planet.sun:
-                # The sun does not move in this simulation.
+                # The sun does not move in this current version of the simulation.
                 planet.update_position(planets)
             planet.draw(window)
 
