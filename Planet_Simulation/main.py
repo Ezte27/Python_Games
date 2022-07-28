@@ -17,11 +17,12 @@ FONT = pygame.font.SysFont("comicsans", 16)
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Planet Simulation")
 
+
 class Planet:
-    AU = (1.496e+8) # 149600000000.0 km 149598000
-    G = 6.67428e-11 
-    SCALE = 100/AU# 100 / AU # 1AU = 100px /// 0.00006147717 = 150 / AU
-    TIMESTEP = 3600 * 24 / 200000 # one day in seconds
+    AU = (149597870.7)  # 149600000000.0 km 149598000
+    G = 6.67428e-11
+    SCALE = 100.0/AU  # 100 / AU # 1AU = 100px /// 0.00006147717 = 150 / AU
+    TIMESTEP = 3600 * 24 / 200000  # one day in seconds
 
     def __init__(self, x, y, radius, color, mass) -> None:
         self.x = x
@@ -37,7 +38,8 @@ class Planet:
         self.x_vel = 0
         self.y_vel = 0
 
-        self.rect = pygame.Rect(self.x, self.y, math.sqrt(2) * self.radius, math.sqrt(2) * self.radius)
+        self.rect = pygame.Rect(self.x, self.y, math.sqrt(
+            2) * self.radius, math.sqrt(2) * self.radius)
 
     def draw(self, window):
         x = self.x * self.SCALE + WIDTH/2
@@ -56,11 +58,12 @@ class Planet:
 
             pygame.draw.lines(window, self.color, False, updated_points)
 
-
         pygame.draw.circle(window, self.color, (x, y), self.radius)
         if self.mass == 5.972 * 10**24:
-            distance_text = FONT.render(f"{round(self.distance_to_sun, 1)}km", 1, WHITE)
-            window.blit(distance_text, (x - distance_text.get_width()/2, y - distance_text.get_height()/2))
+            distance_text = FONT.render(
+                f"{round(self.distance_to_sun, 1)}km", 1, WHITE)
+            window.blit(distance_text, (x - distance_text.get_width() /
+                        2, y - distance_text.get_height()/2))
 
     def attraction(self, other):
         other_x, other_y = other.x, other.y
@@ -82,7 +85,7 @@ class Planet:
         for planet in planets:
             if self == planet:
                 continue
-            
+
             fx, fy = self.attraction(planet)
             total_fx += fx
             total_fy += fy
@@ -93,25 +96,27 @@ class Planet:
         self.x += self.x_vel * self.TIMESTEP
         self.y += self.y_vel * self.TIMESTEP
         self.orbit.append((self.x, self.y))
-    
-    def check_collision(self, planets:list):
+
+    def check_collision(self, planets: list):
         for planet in planets:
             if planet == self:
                 continue
-                    
+
             if self.rect.colliderect(planet.rect) and not planet.sun:
                 return (planet)
         return False
+
 
 def main(FPS):
     running = True
     clock = pygame.time.Clock()
 
-    sun = Planet(0, 0, 30, YELLOW, 1.98892 * 10**30)
+    sun = Planet(0, 0, 0.4654, YELLOW, 1.98892 * 10**30)
     sun.sun = True
 
-    earth = Planet(-1 * Planet.AU, 0, 16, BLUE, 5.972 * 10**24) # xAU, yAU, radius in px, color, mass in kilograms 
-    earth.y_vel = 29.8 * 31700 # Kilometers per second
+    # xAU, yAU, radius in px, color, mass in kilograms
+    earth = Planet(-1 * Planet.AU, 0, 16, BLUE, 5.972 * 10**24)
+    earth.y_vel = 29.8 * 31700  # Kilometers per second
 
     # moon = Planet(-0.99 * Planet.AU, 0, 2.5, GRAY, 7.34767309 * 10**22)
     # moon.y_vel = 29.783 * 1000
@@ -130,26 +135,38 @@ def main(FPS):
     while running:
         clock.tick(FPS)
         window.fill(BLACK)
-        print(earth.x * earth.SCALE + WIDTH/2)
+        #print(earth.x * earth.SCALE + WIDTH/2)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
                     running = False
-            
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:
+                    print("up")
+                elif event.button == 5:
+                    print("down")
+
         for planet in planets:
             collision = planet.check_collision(planets)
             if collision:
                 planets.remove(collision)
 
             if not planet.sun:
-                planet.update_position(planets)     # The sun does not move in this simulation.
+                # The sun does not move in this simulation.
+                planet.update_position(planets)
             planet.draw(window)
-        
+
+        pygame.draw.line(window, WHITE, (WIDTH/2, HEIGHT/2),
+                         (100 + WIDTH/2, HEIGHT/2))
+
         pygame.display.update()
 
     pygame.quit()
+
 
 main(FPS)
