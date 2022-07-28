@@ -21,7 +21,7 @@ class Planet:
     AU = (1.496e+8) # 149600000000.0 km 149598000
     G = 6.67428e-11 
     SCALE = 100/AU# 100 / AU # 1AU = 100px /// 0.00006147717 = 150 / AU
-    TIMESTEP = 3600 * 24 / 200000000000000 # one day in seconds
+    TIMESTEP = 3600 * 24 / 200000 # one day in seconds
 
     def __init__(self, x, y, radius, color, mass) -> None:
         self.x = x
@@ -37,9 +37,14 @@ class Planet:
         self.x_vel = 0
         self.y_vel = 0
 
+        self.rect = pygame.Rect(self.x, self.y, math.sqrt(2) * self.radius, math.sqrt(2) * self.radius)
+
     def draw(self, window):
         x = self.x * self.SCALE + WIDTH/2
         y = self.y * self.SCALE + HEIGHT/2
+
+        self.rect.x = x
+        self.rect.y = y
 
         if len(self.orbit) > 2:
             updated_points = []
@@ -54,7 +59,7 @@ class Planet:
 
         pygame.draw.circle(window, self.color, (x, y), self.radius)
         if self.mass == 5.972 * 10**24:
-            distance_text = FONT.render(f"{round(self.distance_to_sun/1000, 1)}km", 1, WHITE)
+            distance_text = FONT.render(f"{round(self.distance_to_sun, 1)}km", 1, WHITE)
             window.blit(distance_text, (x - distance_text.get_width()/2, y - distance_text.get_height()/2))
 
     def attraction(self, other):
@@ -88,6 +93,15 @@ class Planet:
         self.x += self.x_vel * self.TIMESTEP
         self.y += self.y_vel * self.TIMESTEP
         self.orbit.append((self.x, self.y))
+    
+    def check_collision(self, planets:list):
+        for planet in planets:
+            if planet == self:
+                continue
+                    
+            if self.rect.colliderect(planet.rect) and not planet.sun:
+                return (planet)
+        return False
 
 def main(FPS):
     running = True
@@ -97,7 +111,7 @@ def main(FPS):
     sun.sun = True
 
     earth = Planet(-1 * Planet.AU, 0, 16, BLUE, 5.972 * 10**24) # xAU, yAU, radius in px, color, mass in kilograms 
-    earth.y_vel = 29.8 # Kilometers per second
+    earth.y_vel = 29.8 * 31700 # Kilometers per second
 
     # moon = Planet(-0.99 * Planet.AU, 0, 2.5, GRAY, 7.34767309 * 10**22)
     # moon.y_vel = 29.783 * 1000
@@ -111,7 +125,7 @@ def main(FPS):
     venus = Planet(0.721066412879 * Planet.AU, 0, 14, WHITE, 4.8685 * 10**2)
     venus.y_vel = -35.02 * 1000
 
-    planets = [sun, mercury, venus, earth, mars]
+    planets = [sun, mercury, venus, earth]
 
     while running:
         clock.tick(FPS)
@@ -126,6 +140,10 @@ def main(FPS):
                     running = False
             
         for planet in planets:
+            collision = planet.check_collision(planets)
+            if collision:
+                planets.remove(collision)
+
             if not planet.sun:
                 planet.update_position(planets)     # The sun does not move in this simulation.
             planet.draw(window)
