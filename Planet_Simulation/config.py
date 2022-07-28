@@ -1,0 +1,11 @@
+# Colors
+YELLOW = (240, 240, 40)
+WHITE = (255, 240, 240)
+BLACK = (0, 0, 0)
+BLUE = (100, 120, 237)
+RED = (230, 100, 102)
+GRAY = (80, 78, 81)
+
+# Screen
+WIDTH, HEIGHT = 800, 600
+FPS = 60
