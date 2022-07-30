@@ -191,9 +191,6 @@ def main(FPS):
                 planet.update_position(planets)
             planet.draw(window)
 
-        pygame.draw.line(window, WHITE, (WIDTH/2, HEIGHT/2),
-                         (100 + WIDTH/2, HEIGHT/2))
-
         debug_text = FONT.render(f"{sun.y} sun y", False, WHITE)
         window.blit(debug_text, (10, 10))
 
