@@ -153,15 +153,16 @@ def main(FPS):
             if event.type == pygame.MOUSEBUTTONDOWN:  # Scroll behavior
                 if event.button == 4:  # Up scroll
                     for planet in planets:
+                        planet.SCALE += 0.0000001
+
+                elif event.button == 5:  # Down scroll
+                    for planet in planets:
                         if planet.SCALE > 0.0000005:
                             planet.SCALE -= 0.0000001
 
                         else:
                             planet.SCALE = 0.0000005
-
-                elif event.button == 5:  # Down scroll
-                    for planet in planets:
-                        planet.SCALE += 0.0000001
+                        
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
