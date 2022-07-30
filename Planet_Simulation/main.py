@@ -21,7 +21,7 @@ pygame.display.set_caption("Planet Simulation")
 class Planet:
     AU = (149597870.7)  # 149600000000.0 km 149598000
     G = 6.67428e-11
-    SCALE = 100.0/AU # 100 / AU # 1AU = 100px /// 0.00006147717 = 150 / AU
+    SCALE = 100.0/AU  # 100 / AU # 1AU = 100px /// 0.00006147717 = 150 / AU
     TIMESTEP = 3600 * 24 / 200000  # one day in seconds
 
     def __init__(self, x, y, radius, color, mass) -> None:
@@ -106,12 +106,17 @@ class Planet:
             if self.rect.colliderect(planet.rect) and not planet.sun:
                 return (planet)
         return False
+    
+    def erase_old_orbit(self):
+        pass
+
 
 def main(FPS):
     running = True
     clock = pygame.time.Clock()
 
-    sun = Planet(0, 0, 30000000, YELLOW, 1.98892 * 10**30) # Sun radius = 0.4654 if SCALE = 100px/AU
+    # Sun radius = 0.4654 if SCALE = 100px/AU
+    sun = Planet(0, 0, 30000000, YELLOW, 1.98892 * 10**30)
     sun.sun = True
 
     # xAU, yAU, radius in px, color, mass in kilograms
@@ -135,7 +140,7 @@ def main(FPS):
     while running:
         clock.tick(FPS)
         window.fill(BLACK)
-        #print(earth.x * earth.SCALE + WIDTH/2)
+        # print(earth.x * earth.SCALE + WIDTH/2)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -145,19 +150,35 @@ def main(FPS):
                 if event.key == pygame.K_q:
                     running = False
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 4: # Up scroll
+            if event.type == pygame.MOUSEBUTTONDOWN:  # Scroll behavior
+                if event.button == 4:  # Up scroll
                     for planet in planets:
-                        if planet.SCALE > 0.0000001:
+                        if planet.SCALE > 0.0000005:
                             planet.SCALE -= 0.0000001
-                        
-                        else:
-                            planet.SCALE = 0.0000001
 
-                elif event.button == 5: # Down scroll
+                        else:
+                            planet.SCALE = 0.0000005
+
+                elif event.button == 5:  # Down scroll
                     for planet in planets:
                         planet.SCALE += 0.0000001
-                        print(planet.SCALE)
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            for planet in planets:
+                planet.y += 4000000000000 * planet.SCALE
+
+        if keys[pygame.K_DOWN]:
+            for planet in planets:
+                planet.y -= 4000000000000 * planet.SCALE
+
+        if keys[pygame.K_RIGHT]:
+            for planet in planets:
+                planet.x -= 4000000000000 * planet.SCALE
+
+        if keys[pygame.K_LEFT]:
+            for planet in planets:
+                planet.x += 4000000000000 * planet.SCALE
 
         for planet in planets:
             collision = planet.check_collision(planets)
@@ -172,7 +193,7 @@ def main(FPS):
         pygame.draw.line(window, WHITE, (WIDTH/2, HEIGHT/2),
                          (100 + WIDTH/2, HEIGHT/2))
 
-        debug_text = FONT.render(f"{earth.SCALE} pxs/AU", False, WHITE)
+        debug_text = FONT.render(f"{sun.y} sun y", False, WHITE)
         window.blit(debug_text, (10, 10))
 
         pygame.display.update()
