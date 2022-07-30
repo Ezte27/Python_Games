@@ -111,7 +111,7 @@ def main(FPS):
     running = True
     clock = pygame.time.Clock()
 
-    sun = Planet(0, 0, 30, YELLOW, 1.98892 * 10**30) # Sun radius = 0.4654 if SCALE = 100px/AU
+    sun = Planet(0, 0, 30000000, YELLOW, 1.98892 * 10**30) # Sun radius = 0.4654 if SCALE = 100px/AU
     sun.sun = True
 
     # xAU, yAU, radius in px, color, mass in kilograms
@@ -148,11 +148,11 @@ def main(FPS):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 4: # Up scroll
                     for planet in planets:
-                        if planet.SCALE > 0:
+                        if planet.SCALE > 0.0000001:
                             planet.SCALE -= 0.0000001
                         
                         else:
-                            planet.SCALE = 0
+                            planet.SCALE = 0.0000001
 
                 elif event.button == 5: # Down scroll
                     for planet in planets:
