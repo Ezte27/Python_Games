@@ -116,7 +116,35 @@ class Planet:
     def check_orbit_time(self):
         if pygame.time.get_ticks() - self.start_time > 50000:
             self.delete_old_orbit = True
+        
+    def move_orbit(self, direction):
+        orbit_x = []
+        orbit_y = []
 
+        if direction == 'u':
+            for point in self.orbit:
+                orbit_x.append(point[0])
+                orbit_y.append(point[1] + ((4000000000000 / (self.SCALE * 2e12)) * 1))
+        
+        elif direction == 'd':
+            for index, point in enumerate(self.orbit):
+                orbit_x.append(point[0])
+                orbit_y.append(point[1] + ((4000000000000 / (self.SCALE * 2e12)) * -1))
+        
+        elif direction == 'r':
+            for index, point in enumerate(self.orbit):
+                orbit_x.append(point[0] + ((4000000000000 / (self.SCALE * 2e12)) * -1)) 
+                orbit_y.append(point[1])
+        
+        elif direction == 'l':
+            for index, point in enumerate(self.orbit):
+                orbit_x.append(point[0] + ((4000000000000 / (self.SCALE * 2e12)) * 1)) 
+                orbit_y.append(point[1])
+
+        self.orbit = list(zip(orbit_x, orbit_y))
+
+    def move_orbit_saving_memory(self):
+        self.orbit = []
 
 def main(FPS):
     running = True
@@ -155,6 +183,7 @@ def main(FPS):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
+                    planet.move_orbit(1)
                     running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:  # Scroll behavior
@@ -174,19 +203,23 @@ def main(FPS):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
             for planet in planets:
-                planet.y += 4000000000000 * planet.SCALE
+                planet.y += 4000000000000 / (planet.SCALE * 2e12)
+                planet.move_orbit('u') # Delete the orbit when the screen moves
 
         if keys[pygame.K_DOWN]:
             for planet in planets:
-                planet.y -= 4000000000000 * planet.SCALE
+                planet.y -= 4000000000000 / (planet.SCALE * 2e12)
+                planet.move_orbit('d') # Delete the orbit when the screen moves
 
         if keys[pygame.K_RIGHT]:
             for planet in planets:
-                planet.x -= 4000000000000 * planet.SCALE
+                planet.x -= 4000000000000 / (planet.SCALE * 2e12)
+                planet.move_orbit('r') # Delete the orbit when the screen moves
 
         if keys[pygame.K_LEFT]:
             for planet in planets:
-                planet.x += 4000000000000 * planet.SCALE
+                planet.x += 4000000000000 / (planet.SCALE * 2e12)
+                planet.move_orbit('l') # Delete the orbit when the screen moves
 
         for planet in planets:
             collision = planet.check_collision(planets)
