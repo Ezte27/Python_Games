@@ -162,15 +162,15 @@ def main(FPS):
     # moon.y_vel = 29.783 * 1000
 
     mars = Planet(-1.39915093056 * Planet.AU, 0, 12, RED, 6.39 * 10**23)
-    mars.y_vel = 24.077 * 1000
+    mars.y_vel = 24.077 * 31000
 
     mercury = Planet(0.37558689664 * Planet.AU, 0, 8, GRAY, 3.30 * 10**23)
-    mercury.y_vel = -47.4 * 1000
+    mercury.y_vel = -47.4 * 32700
 
     venus = Planet(0.721066412879 * Planet.AU, 0, 14, WHITE, 4.8685 * 10**2)
-    venus.y_vel = -35.02 * 1000
+    venus.y_vel = -35.02 * 31700
 
-    planets = [sun, earth]
+    planets = [sun, mercury, venus, earth, mars]
 
     while running:
         clock.tick(FPS)
