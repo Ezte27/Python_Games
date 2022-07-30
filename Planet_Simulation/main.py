@@ -108,7 +108,7 @@ class Planet:
         return False
     
     def erase_old_orbit(self):
-        pass
+        print(len(self.orbit))
 
 
 def main(FPS):
@@ -189,9 +189,10 @@ def main(FPS):
             if not planet.sun:
                 # The sun does not move in this current version of the simulation.
                 planet.update_position(planets)
+                planet.erase_old_orbit()
             planet.draw(window)
 
-        debug_text = FONT.render(f"{sun.y} sun y", False, WHITE)
+        debug_text = FONT.render(f"{sun.rect.y} sun y", False, WHITE)
         window.blit(debug_text, (10, 10))
 
         pygame.display.update()
