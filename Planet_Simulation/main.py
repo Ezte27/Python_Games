@@ -41,6 +41,9 @@ class Planet:
 
         self.rect = pygame.Rect(self.x, self.y, math.sqrt(
             2) * self.radius, math.sqrt(2) * self.radius)
+        
+        self.start_time = pygame.time.get_ticks()
+        self.delete_old_orbit = False
 
     def draw(self, window):
         x = self.x * self.SCALE + WIDTH/2
@@ -108,7 +111,11 @@ class Planet:
         return False
     
     def erase_old_orbit(self):
-        print(len(self.orbit))
+        self.orbit.pop(0)
+    
+    def check_orbit_time(self):
+        if pygame.time.get_ticks() - self.start_time > 50000:
+            self.delete_old_orbit = True
 
 
 def main(FPS):
@@ -189,7 +196,10 @@ def main(FPS):
             if not planet.sun:
                 # The sun does not move in this current version of the simulation.
                 planet.update_position(planets)
-                planet.erase_old_orbit()
+                if planet.delete_old_orbit:
+                    planet.erase_old_orbit()
+                else:
+                    planet.check_orbit_time()
             planet.draw(window)
 
         debug_text = FONT.render(f"{sun.rect.y} sun y", False, WHITE)
