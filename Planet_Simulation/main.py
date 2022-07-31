@@ -176,6 +176,9 @@ def main(FPS):
 
     planets = [sun, mercury, venus, earth, moon, mars]
 
+    paused = False
+    old_timestep = 0
+
     while running:
         clock.tick(FPS)
         window.fill(BLACK)
@@ -187,8 +190,19 @@ def main(FPS):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
-                    planet.move_orbit(1)
                     running = False
+                
+                elif event.key == pygame.K_SPACE:
+                    if not paused:
+                        for planet in planets:
+                            old_timestep = planet.TIMESTEP
+                            planet.TIMESTEP = 0
+                            paused = True
+
+                    elif paused:
+                        for planet in planets:
+                            planet.TIMESTEP = old_timestep
+                            paused = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:  # Scroll behavior
                 if event.button == 4:  # Up scroll
