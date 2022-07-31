@@ -163,7 +163,7 @@ def main(FPS):
     earth.y_vel = 29.8 * 31700  # Kilometers per second
 
     moon = Planet(-0.99962 * Planet.AU, 0, 6000, GRAY, 7.34767309 * 10**22)
-    moon.y_vel = 29.8 * 31700#34098.01
+    moon.y_vel = 29.8 * 31701   #34098.01
 
     mars = Planet(-1.39915093056 * Planet.AU, 0, 12, RED, 6.39 * 10**23)
     mars.y_vel = 24.077 * 33000
