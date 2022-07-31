@@ -41,7 +41,7 @@ class Planet:
 
         self.rect = pygame.Rect(self.x, self.y, math.sqrt(
             2) * self.radius, math.sqrt(2) * self.radius)
-        
+
         self.start_time = pygame.time.get_ticks()
         self.delete_old_orbit = False
 
@@ -63,11 +63,10 @@ class Planet:
             pygame.draw.lines(window, self.color, False, updated_points)
         self.radius = self.original_radius * self.SCALE
         pygame.draw.circle(window, self.color, (x, y), self.radius)
-        if self.mass == 5.972 * 10**24:
-            distance_text = FONT.render(
-                f"{round(self.distance_to_sun, 1)}km", 1, WHITE)
-            window.blit(distance_text, (x - distance_text.get_width() /
-                        2, y - distance_text.get_height()/2))
+        distance_text = FONT.render(
+            f"{round(self.distance_to_sun, 1)}km", 1, WHITE)
+        window.blit(distance_text, (x - distance_text.get_width() /
+                                    2, y - distance_text.get_height()/2))
 
     def attraction(self, other):
         other_x, other_y = other.x, other.y
@@ -109,14 +108,14 @@ class Planet:
             if self.rect.colliderect(planet.rect) and not planet.sun:
                 return (planet)
         return False
-    
+
     def erase_old_orbit(self):
         self.orbit.pop(0)
-    
+
     def check_orbit_time(self):
         if pygame.time.get_ticks() - self.start_time > 50000:
             self.delete_old_orbit = True
-        
+
     def move_orbit(self, direction):
         orbit_x = []
         orbit_y = []
@@ -124,27 +123,32 @@ class Planet:
         if direction == 'u':
             for point in self.orbit:
                 orbit_x.append(point[0])
-                orbit_y.append(point[1] + ((4000000000000 / (self.SCALE * 2e12)) * 1))
-        
+                orbit_y.append(
+                    point[1] + ((4000000000000 / (self.SCALE * 2e12)) * 1))
+
         elif direction == 'd':
             for index, point in enumerate(self.orbit):
                 orbit_x.append(point[0])
-                orbit_y.append(point[1] + ((4000000000000 / (self.SCALE * 2e12)) * -1))
-        
+                orbit_y.append(
+                    point[1] + ((4000000000000 / (self.SCALE * 2e12)) * -1))
+
         elif direction == 'r':
             for index, point in enumerate(self.orbit):
-                orbit_x.append(point[0] + ((4000000000000 / (self.SCALE * 2e12)) * -1)) 
+                orbit_x.append(
+                    point[0] + ((4000000000000 / (self.SCALE * 2e12)) * -1))
                 orbit_y.append(point[1])
-        
+
         elif direction == 'l':
             for index, point in enumerate(self.orbit):
-                orbit_x.append(point[0] + ((4000000000000 / (self.SCALE * 2e12)) * 1)) 
+                orbit_x.append(
+                    point[0] + ((4000000000000 / (self.SCALE * 2e12)) * 1))
                 orbit_y.append(point[1])
 
         self.orbit = list(zip(orbit_x, orbit_y))
 
     def move_orbit_saving_memory(self):
         self.orbit = []
+
 
 def main(FPS):
     running = True
@@ -155,14 +159,14 @@ def main(FPS):
     sun.sun = True
 
     # xAU, yAU, radius in px, color, mass in kilograms
-    earth = Planet(-1 * Planet.AU, 0, 16, BLUE, 5.972 * 10**24)
+    earth = Planet(-1 * Planet.AU, 0, 16000, BLUE, 5.972 * 10**24)
     earth.y_vel = 29.8 * 31700  # Kilometers per second
 
-    # moon = Planet(-0.99 * Planet.AU, 0, 2.5, GRAY, 7.34767309 * 10**22)
-    # moon.y_vel = 29.783 * 1000
+    moon = Planet(-0.99962 * Planet.AU, 0, 6000, GRAY, 7.34767309 * 10**22)
+    moon.y_vel = 29.8 * 31700#34098.01
 
     mars = Planet(-1.39915093056 * Planet.AU, 0, 12, RED, 6.39 * 10**23)
-    mars.y_vel = 24.077 * 31000
+    mars.y_vel = 24.077 * 33000
 
     mercury = Planet(0.37558689664 * Planet.AU, 0, 8, GRAY, 3.30 * 10**23)
     mercury.y_vel = -47.4 * 32700
@@ -170,7 +174,7 @@ def main(FPS):
     venus = Planet(0.721066412879 * Planet.AU, 0, 14, WHITE, 4.8685 * 10**2)
     venus.y_vel = -35.02 * 31700
 
-    planets = [sun, mercury, venus, earth, mars]
+    planets = [sun, mercury, venus, earth, moon, mars]
 
     while running:
         clock.tick(FPS)
@@ -198,28 +202,45 @@ def main(FPS):
 
                         else:
                             planet.SCALE = 0.0000005
-                        
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
             for planet in planets:
                 planet.y += 4000000000000 / (planet.SCALE * 2e12)
-                planet.move_orbit('u') # Delete the orbit when the screen moves
+                # Delete the orbit when the screen moves
+                planet.move_orbit('u')
+        
+        # lines below for dev purposes only
+        if keys[pygame.K_w]:
+            for planet in planets:
+                planet.y += 400000000000000 / (planet.SCALE * 2e12)
+                # Delete the orbit when the screen moves
+                planet.move_orbit('u')
+        
+        if keys[pygame.K_s]:
+            for planet in planets:
+                planet.y -= 400000000000000 / (planet.SCALE * 2e12)
+                # Delete the orbit when the screen moves
+                planet.move_orbit('u')
+        # lines above for dev purposes only
 
         if keys[pygame.K_DOWN]:
             for planet in planets:
                 planet.y -= 4000000000000 / (planet.SCALE * 2e12)
-                planet.move_orbit('d') # Delete the orbit when the screen moves
+                # Delete the orbit when the screen moves
+                planet.move_orbit('d')
 
         if keys[pygame.K_RIGHT]:
             for planet in planets:
                 planet.x -= 4000000000000 / (planet.SCALE * 2e12)
-                planet.move_orbit('r') # Delete the orbit when the screen moves
+                # Delete the orbit when the screen moves
+                planet.move_orbit('r')
 
         if keys[pygame.K_LEFT]:
             for planet in planets:
                 planet.x += 4000000000000 / (planet.SCALE * 2e12)
-                planet.move_orbit('l') # Delete the orbit when the screen moves
+                # Delete the orbit when the screen moves
+                planet.move_orbit('l')
 
         for planet in planets:
             collision = planet.check_collision(planets)
@@ -235,7 +256,7 @@ def main(FPS):
                     planet.check_orbit_time()
             planet.draw(window)
 
-        debug_text = FONT.render(f"{sun.rect.y} sun y", False, WHITE)
+        debug_text = FONT.render(f"{earth.rect.x - WIDTH/2} earth x", False, WHITE)
         window.blit(debug_text, (10, 10))
 
         pygame.display.update()
