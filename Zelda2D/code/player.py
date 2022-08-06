@@ -43,7 +43,7 @@ class Player(Entity):
             'attack': 100,
             'speed': 120
         }
-        self.health = self.stats['health'] * 0.5
+        self.health = self.stats['health']
         self.energy = self.stats['energy']
         self.speed = self.stats['speed']
         self.exp = 500

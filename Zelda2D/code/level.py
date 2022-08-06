@@ -11,6 +11,7 @@ from tree import Tree
 from enemy import Enemy
 from upgrade_menu import Upgrade_menu
 from pathlib import Path
+import sys
 
 floorBlocks_file_path = Path("Zelda2D\map\map_FloorBlocks.csv").resolve().absolute()
 grass_file_path = Path('Zelda2D\map\map_Grass.csv').resolve().absolute()
@@ -131,6 +132,9 @@ class Level:
             self.player.health -= amount
             self.player.vulnerable = False
             self.player.hurt_time = pygame.time.get_ticks()
+            if self.player.health <= 0:
+                pygame.quit()
+                sys.exit()
     
     def toggle_menu(self):
         self.game_paused = not self.game_paused
