@@ -20,9 +20,9 @@ class Game:
                     run = False
 
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_a] or keys[pygame.K_RIGHT]:
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
                 self.game.move_paddle(right = False)
-            elif keys[pygame.K_d] or keys[pygame.K_LEFT]:
+            elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self.game.move_paddle(right = True)
             elif keys[pygame.K_r]:
                 self.game.reset()
