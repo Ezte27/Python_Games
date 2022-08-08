@@ -36,6 +36,7 @@ class FRUIT():
         self.x_pos = random.randint(0, cell_number - 1)
         self.y_pos = random.randint(0, cell_number - 1)
         self.pos = (self.x_pos, self.y_pos)
+        self.rect.x, self.rect.y = self.x_pos * cell_size, self.y_pos * cell_size
 
 class SNAKE():
     def __init__(self):
@@ -188,6 +189,7 @@ class Button:
                         sys.exit()
                     elif self.function == 'playagain':
                         main_game.snake.body = main_game.snake.original_body
+                        main_game.fruit.randomize()
                         main_game.lost = False
                         
                     print('Click')
