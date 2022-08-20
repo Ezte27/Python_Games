@@ -1,5 +1,9 @@
 from pygame.math import Vector2
 
+# General
+TOOLS = ['hoe', 'axe', 'water'] # All the tools available in the game (not necessarily the player tools)
+SEEDS = ['corn', 'tomato'] # All the seeds available in the game
+
 # Screen
 SCREEN_WIDTH = 800#1366
 SCREEN_HEIGHT = 600#768

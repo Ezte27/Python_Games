@@ -23,14 +23,27 @@ class Player(pygame.sprite.Sprite):
         self.speed = PLAYER_SPEED
 
         # Tools
-        self.selected_tool = 'axe'
+        self.tools = ['hoe', 'axe', 'water']
+        self.tool_index = 0
+        self.selected_tool = self.tools[self.tool_index]
+
+        # Seeds
+        self.seeds = ['corn', 'tomato']
+        self.seed_index = 0
+        self.selected_seed = self.seeds[self.seed_index]
 
         #Timers
         self.timers = {
-            'tool_use': Timer(350, self.use_tool)
+            'tool_use': Timer(350, self.use_tool),
+            'tool_switch': Timer(200),
+            'seed_use': Timer(350, self.use_seed),
+            'seed_switch': Timer(200)
         }
     
     def use_tool(self):
+        pass
+    
+    def use_seed(self):
         pass
 
     def import_assets(self):
@@ -79,6 +92,28 @@ class Player(pygame.sprite.Sprite):
                 self.timers['tool_use'].activate()
                 self.direction = pygame.math.Vector2()
                 self.frame_index = 0
+
+            # Change Tool
+            if keys[pygame.K_q] and not self.timers['tool_switch'].active:
+                self.timers['tool_switch'].activate()
+                self.tool_index += 1
+                self.tool_index = 0 if self.tool_index > len(self.tools) - 1 else self.tool_index
+                self.selected_tool = self.tools[self.tool_index]
+            
+            # Seed use
+            if keys[pygame.K_1]:
+                self.timers['seed_use'].activate()
+                self.direction = pygame.math.Vector2()
+                self.frame_index = 0
+                print('Use seed')
+
+            # Change Seed
+            if keys[pygame.K_e] and not self.timers['seed_switch'].active:
+                self.timers['seed_switch'].activate()
+                self.seed_index += 1
+                self.seed_index = 0 if self.seed_index > len(self.seeds) - 1 else self.seed_index
+                self.selected_seed = self.seeds[self.seed_index]
+                print(f'Change seed to {self.selected_seed}')
 
     def get_status(self):
         # Idle
