@@ -11,7 +11,7 @@ SCREEN_CAPTION = 'PYDEW VALLEY'
 TILE_SIZE = 64
 
 # Player Attributes
-PLAYER_SPEED = 150
+PLAYER_SPEED = 200
 
 # Overlay positions
 

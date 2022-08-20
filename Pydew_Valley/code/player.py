@@ -16,6 +16,7 @@ class Player(pygame.sprite.Sprite):
         # General Setup
         self.image = self.animations[self.status][self.frame_index] # image surface for sprites, it is used by pygame.sprite.Sprite
         self.rect = self.image.get_rect(center = pos)
+        self.z = LAYERS['main']
 
         # Movement Attributes
         self.direction = pygame.math.Vector2()
