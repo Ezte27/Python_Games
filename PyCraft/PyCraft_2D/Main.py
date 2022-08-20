@@ -8,4 +8,4 @@ while True:
             pygame.quit()
             sys.exit()
 
-    pygame.display.flip()
+    pygame.display.update()
