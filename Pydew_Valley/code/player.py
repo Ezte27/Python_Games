@@ -55,11 +55,11 @@ class Player(pygame.sprite.Sprite):
                            'right_water': [], 'left_water': [], 'up_water': [], 'down_water': []}
 
         for animation in self.animations.keys():
-            full_path = os.getcwd() + "/assets/character/" + animation
+            full_path = os.getcwd() + "/graphics/character/" + animation
             self.animations[animation] = import_folder(full_path)
 
     def animate(self, dt):
-        self.frame_index += 4 * dt
+        self.frame_index += ANIMATE_PLAYER_SPEED * dt
         if self.frame_index >= len(self.animations[self.status]):
             self.frame_index = 0
 
@@ -70,19 +70,19 @@ class Player(pygame.sprite.Sprite):
 
         if not self.timers['tool_use'].active:
             # Directions
-            if keys[pygame.K_UP]:
+            if keys[pygame.K_w]:
                 self.direction.y = -1
                 self.status = 'up'
-            elif keys[pygame.K_DOWN]:
+            elif keys[pygame.K_s]:
                 self.direction.y = 1
                 self.status = 'down'
             else:
                 self.direction.y = 0
 
-            if keys[pygame.K_RIGHT]:
+            if keys[pygame.K_d]:
                 self.direction.x = 1
                 self.status = 'right'
-            elif keys[pygame.K_LEFT]:
+            elif keys[pygame.K_a]:
                 self.direction.x = -1
                 self.status = 'left'
             else:

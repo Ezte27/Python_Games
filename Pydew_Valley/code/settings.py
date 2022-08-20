@@ -12,6 +12,7 @@ TILE_SIZE = 64
 
 # Player Attributes
 PLAYER_SPEED = 200
+ANIMATE_PLAYER_SPEED = 4
 
 # Overlay positions
 
