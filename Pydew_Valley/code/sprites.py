@@ -39,6 +39,23 @@ class WildFlower(Generic):
         super().__init__(pos, surf, groups)
         self.hitbox = self.rect.copy().inflate(-20, -self.rect.height * 0.9)
 
+class Particle(Generic):
+    def __init__(self, pos, surf, groups, z, duration = 200) -> None:
+        super().__init__(pos, surf, groups, z)
+        self.start_time = pygame.time.get_ticks()
+        self.duration = duration
+
+        # White Surface
+        mask_surf = pygame.mask.from_surface(self.image)
+        new_surf = mask_surf.to_surface()
+        new_surf.set_colorkey((0,0,0))
+        self.image = new_surf
+    
+    def update(self, dt):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.start_time > self.duration:
+            self.kill()
+
 class Tree(Generic):
     def __init__(self, pos, surf, groups, name) -> None:
         super().__init__(pos, surf, groups)
@@ -62,10 +79,17 @@ class Tree(Generic):
         # Remove an apple
         if len(self.apple_sprites.sprites()):
             random_apple = choice(self.apple_sprites.sprites())
+            Particle(
+                pos = random_apple.rect.topleft,
+                surf = random_apple.image,
+                groups = self.groups()[0],
+                z = LAYERS['fruit']
+            )
             random_apple.kill()
     
     def check_death(self):
         if self.health <= 0:
+            Particle(self.rect.topleft, self.image, self.groups()[0], LAYERS['fruit'], duration=400)
             self.image = self.stump_surf
             self.rect = self.image.get_rect(midbottom = self.rect.midbottom)
             self.hitbox = self.rect.copy().inflate(-10, -self.rect.height * 0.6)
