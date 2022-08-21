@@ -16,6 +16,7 @@ class Level:
         # Sprite Groups
         self.all_sprites = CameraGroup()
         self.collision_sprites = pygame.sprite.Group()
+        self.tree_sprites = pygame.sprite.Group()
 
         # Extra
         self.cwd = os.getcwd()
@@ -51,7 +52,7 @@ class Level:
         
         # Trees
         for obj in tmx_data.get_layer_by_name('Trees'):
-            Tree((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites], obj.name)
+            Tree((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites, self.tree_sprites], obj.name)
 
         # Ground
         Generic((0, 0), pygame.image.load(os.getcwd() + '/graphics/world/ground.png').convert_alpha(), self.all_sprites, z=LAYERS['ground'])
@@ -63,7 +64,7 @@ class Level:
         # Player
         for obj in tmx_data.get_layer_by_name('Player'):
             if obj.name == 'Start':
-                self.player = Player((obj.x, obj.y), [self.all_sprites], self.collision_sprites)
+                self.player = Player((obj.x, obj.y), [self.all_sprites], self.collision_sprites, self.tree_sprites)
     
     def run(self, dt):
         self.display_surface.fill('black')
@@ -89,3 +90,9 @@ class CameraGroup(pygame.sprite.Group):
                     offset_rect = sprite.rect.copy()
                     offset_rect.center -= self.offset
                     self.display_surface.blit(sprite.image, offset_rect)
+
+                    # if sprite == player:
+                    #     pygame.draw.rect(self.display_surface, 'red', offset_rect, 5)
+                    #     hitbox_rect = player.hitbox.copy()
+                    #     hitbox_rect.center = offset_rect.center
+                    #     pygame.draw.rect(self.display_surface, 'green', hitbox_rect,5)
