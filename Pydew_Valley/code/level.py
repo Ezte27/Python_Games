@@ -52,7 +52,7 @@ class Level:
         
         # Trees
         for obj in tmx_data.get_layer_by_name('Trees'):
-            Tree((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites, self.tree_sprites], obj.name)
+            Tree((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites, self.tree_sprites], obj.name, player_add = self.player_add_item)
 
         # Ground
         Generic((0, 0), pygame.image.load(os.getcwd() + '/graphics/world/ground.png').convert_alpha(), self.all_sprites, z=LAYERS['ground'])
@@ -66,10 +66,14 @@ class Level:
             if obj.name == 'Start':
                 self.player = Player((obj.x, obj.y), [self.all_sprites], self.collision_sprites, self.tree_sprites)
     
+    def player_add_item(self, item, n = 1):
+        self.player.item_inventory[item] += n
+
     def run(self, dt):
         self.display_surface.fill('black')
         self.all_sprites.customize_draw(self.player) # The draw function from pygame.sprite.Group()
         self.all_sprites.update(dt)
+        print(self.player.item_inventory)
 
         self.overlay.display()
 
