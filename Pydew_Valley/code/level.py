@@ -73,7 +73,6 @@ class Level:
         self.display_surface.fill('black')
         self.all_sprites.customize_draw(self.player) # The draw function from pygame.sprite.Group()
         self.all_sprites.update(dt)
-        print(self.player.item_inventory)
 
         self.overlay.display()
 
