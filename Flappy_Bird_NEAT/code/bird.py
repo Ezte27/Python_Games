@@ -7,6 +7,7 @@ class Bird:
         # Bird attributes
         self.img = BIRD_IMGS[0]
         self.rect = self.img.get_rect(center = pos)
+        self.score = 0
 
         # Animation
         self.img_count = 0

@@ -1,8 +1,8 @@
 import pygame
 import neat
-import random
 from settings import *
 from bird import Bird
+from pipe import Pipe
 
 class Game:
     def __init__(self) -> None:
