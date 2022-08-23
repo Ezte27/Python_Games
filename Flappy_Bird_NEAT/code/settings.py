@@ -26,3 +26,4 @@ PIPE_BOTTOM = PIPE_IMG
 
 # Base
 BASE_VEL = 5
+BASE_WIDTH = BASE_IMG.get_width()
