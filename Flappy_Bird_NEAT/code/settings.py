@@ -5,7 +5,7 @@ import os
 SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 700
 SCREEN_CAPTION = 'Flappy Bird With NEAT'
-FPS = 300
+FPS = 30
 
 # Fonts
 STAT_FONT = pygame.font.SysFont("comicsans", 50)

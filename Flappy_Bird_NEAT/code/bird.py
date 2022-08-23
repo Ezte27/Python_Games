@@ -1,5 +1,6 @@
 import pygame
 from settings import *
+from timer import Timer
 
 class Bird:
     def __init__(self, pos) -> None:
@@ -19,10 +20,27 @@ class Bird:
         self.vel = 0
         self.height = self.y
 
+        # Timers
+        self.timers = {
+                       "jump": Timer(50)
+                       }
+
     def jump(self):
-        self.vel = -10.5
+        self.vel = -8.7
         self.tick_count = 0
         self.height = self.y
+    
+    def input(self):
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_SPACE]: #and not self.timers["jump"].active:
+            self.jump()
+            #self.timers["jump"].activate()
+    
+    def update_timers(self):
+        # Timers Update
+        for timer in self.timers.values():
+            timer.update()
     
     def move(self):
         self.tick_count += 1

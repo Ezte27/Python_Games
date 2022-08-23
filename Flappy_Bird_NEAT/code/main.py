@@ -65,7 +65,10 @@ class Game:
         self.base.move()
         self.base.draw(self.screen)
 
-        #self.bird.move()
+        # Player Update
+        #self.bird.update_timers()
+        self.bird.input()
+        self.bird.move()
         self.bird.draw(self.screen)
 
         self.clock.tick(FPS)
