@@ -3,9 +3,12 @@ import os
 
 # Screen config
 SCREEN_WIDTH = 500
-SCREEN_HEIGHT = 710
+SCREEN_HEIGHT = 700
 SCREEN_CAPTION = 'Flappy Bird With NEAT'
-FPS = 30
+FPS = 300
+
+# Fonts
+STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
 # Images
 BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join('assets\Player', 'bird1.png'))), pygame.transform.scale2x(pygame.image.load(os.path.join('assets\Player', 'bird2.png'))), pygame.transform.scale2x(pygame.image.load(os.path.join('assets\Player', 'bird3.png')))]
@@ -23,6 +26,7 @@ GAP = 200
 PIPE_VEL = 5
 PIPE_TOP = pygame.transform.flip(PIPE_IMG, False, True)
 PIPE_BOTTOM = PIPE_IMG
+PIPE_WIDTH = PIPE_TOP.get_width()
 
 # Base
 BASE_VEL = 5
