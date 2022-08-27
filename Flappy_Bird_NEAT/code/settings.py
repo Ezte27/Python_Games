@@ -8,7 +8,7 @@ SCREEN_CAPTION = 'Flappy Bird With NEAT'
 FPS = 30
 
 # Fonts
-STAT_FONT = pygame.font.SysFont("comicsans", 50)
+STAT_FONT = pygame.font.SysFont("comicsans", 30)
 
 # Images
 BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join('assets\Player', 'bird1.png'))), pygame.transform.scale2x(pygame.image.load(os.path.join('assets\Player', 'bird2.png'))), pygame.transform.scale2x(pygame.image.load(os.path.join('assets\Player', 'bird3.png')))]

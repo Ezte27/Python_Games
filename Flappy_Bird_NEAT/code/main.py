@@ -17,12 +17,13 @@ class Game:
         pygame.display.set_caption(SCREEN_CAPTION)
         self.clock = pygame.time.Clock()
 
+        self.gen = 0
+
         # NEAT Setup
         self.neat_run(config_path)
-
         
-
     def eval_genomes(self, genomes, config):
+        self.gen += 1
         self.nets = []
         self.ge = []
         self.birds = []
@@ -61,8 +62,12 @@ class Game:
                 pipe.draw(self.screen)
 
             # Drawing Score
-            text = STAT_FONT.render("Score: " + str(self.score), 1, (255,255,255))
-            self.screen.blit(text, (SCREEN_WIDTH - 10 - text.get_width(), 10))
+            text_score = STAT_FONT.render("Score: " + str(self.score), 1, (255,255,255))
+            self.screen.blit(text_score, (SCREEN_WIDTH - 10 - text_score.get_width(), 10))
+
+            # Drawing Generation
+            text_gen = STAT_FONT.render("Gen: " + str(self.gen), 1, (255,255,255))
+            self.screen.blit(text_gen, (SCREEN_WIDTH - 30 - text_gen.get_width() - text_score.get_width(), 10))
             
             pipe_ind = 0
             if len(self.birds) > 0:
@@ -73,7 +78,7 @@ class Game:
 
             for x, bird in enumerate(self.birds):
                 bird.move()
-                self.ge[x].fitness += 0.1
+                self.ge[x].fitness += 0.06
 
                 output = self.nets[x].activate((bird.y, abs(bird.y - self.pipes[pipe_ind].height), abs(bird.y - self.pipes[pipe_ind].bottom)))
 
@@ -86,7 +91,7 @@ class Game:
                 pipe.move()
                 for x, bird in enumerate(self.birds):
                     if pipe.collide(bird):
-                        self.ge[x].fitness -= 1
+                        self.ge[x].fitness -= 2
                         self.birds.pop(x)
                         self.nets.pop(x)
                         self.ge.pop(x)
@@ -103,13 +108,14 @@ class Game:
                 self.score += 1
                 for g in self.ge:
                     g.fitness += 5
-                self.pipes.append(Pipe(SCREEN_WIDTH*1.2))
+                self.pipes.append(Pipe(SCREEN_WIDTH*1.4))
             
             for r in rem:
                 self.pipes.remove(r)
             
             for x, bird in enumerate(self.birds):
                 if bird.y + bird.img.get_height() >= SCREEN_HEIGHT - (SCREEN_HEIGHT - self.base.y) or bird.y < 0:
+                    self.ge[x].fitness -= 2
                     self.birds.pop(x)
                     self.nets.pop(x)
                     self.ge.pop(x)
@@ -123,6 +129,9 @@ class Game:
             # self.bird.move()
             for bird in self.birds:
                 bird.draw(self.screen)
+            
+            if self.score >= 20:
+                running = False
 
             pygame.display.update()
 
@@ -150,5 +159,5 @@ if __name__ == '__main__':
     #             pygame.quit()
 
     #     game.run()
-
+    print(game.gen)
 pygame.quit()
