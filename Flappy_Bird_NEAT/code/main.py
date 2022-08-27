@@ -1,3 +1,6 @@
+# Ayudame Esteban del futuro. Las generaciones siguientes no aprenden. I need help
+
+
 import pygame
 # Initializing Pygame First
 pygame.init()
@@ -73,7 +76,7 @@ class Game:
             if len(self.birds) > 0:
                 if len(self.pipes) > 1 and self.birds[0].x > self.pipes[0].x + PIPE_WIDTH:
                     pipe_ind = 1
-            else:
+            else: 
                 running = False
 
             for x, bird in enumerate(self.birds):
