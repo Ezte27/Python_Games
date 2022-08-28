@@ -6,7 +6,7 @@ from support import *
 from timer import Timer
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos:tuple, group, collision_sprites:pygame.sprite.Group, tree_sprites:pygame.sprite.Group) -> None:
+    def __init__(self, pos:tuple, group, collision_sprites:pygame.sprite.Group, tree_sprites:pygame.sprite.Group, interaction:pygame.sprite.Group) -> None:
         super().__init__(group)
 
         self.import_assets()
@@ -17,6 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animations[self.status][self.frame_index] # image surface for sprites, it is used by pygame.sprite.Sprite
         self.rect = self.image.get_rect(center = pos)
         self.z = LAYERS['main']
+        self.sleep = False
 
         # Movement Attributes
         self.direction = pygame.math.Vector2()
@@ -56,6 +57,8 @@ class Player(pygame.sprite.Sprite):
         # Tree interactions
         self.tree_sprites = tree_sprites
 
+        # Interaction
+        self.interaction = interaction
     
     def use_tool(self):
         if self.selected_tool == 'hoe':
@@ -97,7 +100,7 @@ class Player(pygame.sprite.Sprite):
     def input(self):
         keys = pygame.key.get_pressed()
 
-        if not self.timers['tool_use'].active:
+        if (not self.timers['tool_use'].active) and (not self.sleep):
             # Directions
             if keys[pygame.K_w]:
                 self.direction.y = -1
@@ -142,6 +145,16 @@ class Player(pygame.sprite.Sprite):
                 self.seed_index += 1
                 self.seed_index = 0 if self.seed_index > len(self.seeds) - 1 else self.seed_index
                 self.selected_seed = self.seeds[self.seed_index]
+
+            if keys[pygame.K_RETURN]:
+                collided_interaction_sprite = pygame.sprite.spritecollide(self, self.interaction, False)
+                if collided_interaction_sprite:
+                    if collided_interaction_sprite[0].name == "Trader":
+                        pass
+                    
+                    if collided_interaction_sprite[0].name == "Bed":
+                        self.status = 'left_idle'
+                        self.sleep = True
 
     def get_status(self):
         # Idle
