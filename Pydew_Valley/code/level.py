@@ -1,3 +1,4 @@
+from random import randint
 import pygame
 import os
 from support import import_folder
@@ -31,6 +32,7 @@ class Level:
         # Sky
         self.rain = Rain(self.all_sprites)
         self.raining = True
+        self.soil_layer.raining = self.raining
 
         # Setup
         self.setup()
@@ -94,6 +96,12 @@ class Level:
 
         # Soil
         self.soil_layer.remove_water()
+
+        # Raining
+        self.raining = randint(0, 10) > 7
+        self.soil_layer.raining = self.raining
+        if self.raining:
+            self.soil_layer.water_all()
 
     def run(self, dt):
         self.display_surface.fill('black')

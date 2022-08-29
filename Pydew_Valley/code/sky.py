@@ -14,7 +14,7 @@ class Rain:
         self.floor_w, self.floor_h = pygame.image.load("graphics/world/ground.png").get_size()
         
         # Fog
-        self.fog_color = randint(120,180)
+        self.fog_color = randint(140,180)
 
     def create_floor(self):
         Drop((randint(0, self.floor_w), randint(0, self.floor_h)), choice(self.rain_floor), moving=False, groups = [self.all_sprites], z=LAYERS['rain floor'])
@@ -26,6 +26,9 @@ class Rain:
         self.fog_img = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.fog_img.fill((self.fog_color, self.fog_color, self.fog_color))
         self.display_surface.blit(self.fog_img, (0,0), special_flags=pygame.BLEND_RGB_MULT) # pygame.BLEND_RGB_MULT for not showing white color
+
+    def randomize_fog(self):
+        self.fog_color = randint(140,180)
 
     def update(self):
         self.create_floor()
