@@ -11,10 +11,17 @@ window.exit_button.visible = False
 
 def update():
     global block_pick
+    global player
     if held_keys['1']: block_pick = 1
     elif held_keys['2']: block_pick = 2
     elif held_keys['3']: block_pick = 3
     elif held_keys['4']: block_pick = 4
+
+    if held_keys['shift']: player.speed = 10
+    elif not held_keys['shift']: player.speed = 5
+
+    if held_keys["e"]: player.gravity = -0.7
+    else: player.gravity = 1
 
 # Entities
 class Voxel(Button):
@@ -45,6 +52,6 @@ for z in range(20):
     for x in range(20):
         block = Voxel(position = (x, 0, z))
 
-player = FirstPersonController(mouse_sensitivity = Vec2(80, 80), jump_height = 1)
+player = FirstPersonController(mouse_sensitivity = Vec2(80, 80), jump_height = 1, speed = 5, gravity = 1)
 
 game.run()
