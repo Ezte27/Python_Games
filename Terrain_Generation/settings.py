@@ -1,0 +1,10 @@
+import pygame
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+SCREEN_CAPTION = "Perlin Noise - Terrain Generation"
+FPS = 60
+
+HEIGHT_MAP_WIDTH = 60
+HEIGHT_MAP_HEIGHT = 60
+TILE_SIZE = 32
