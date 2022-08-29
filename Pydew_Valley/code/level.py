@@ -7,6 +7,7 @@ from overlay import Overlay
 from sprites import Generic, Water, WildFlower, Tree, Interaction
 from transition import Transition
 from soil import SoilLayer
+from sky import Rain
 from pytmx.util_pygame import load_pygame
 
 class Level:
@@ -24,8 +25,14 @@ class Level:
         # Extra
         self.cwd = os.getcwd()
 
-        # Setup
+        # Soil
         self.soil_layer = SoilLayer(self.all_sprites)
+
+        # Sky
+        self.rain = Rain(self.all_sprites)
+        self.raining = True
+
+        # Setup
         self.setup()
         self.overlay = Overlay(self.player)
         self.transition = Transition(self.reset_day, self.player)
@@ -85,13 +92,21 @@ class Level:
                     apple.kill()
                 tree.create_fruit()
 
+        # Soil
+        self.soil_layer.remove_water()
+
     def run(self, dt):
         self.display_surface.fill('black')
         self.all_sprites.customize_draw(self.player) # The draw function from pygame.sprite.Group()
         self.all_sprites.update(dt)
 
+        # Rain
+        if self.raining:
+            self.rain.update()
+
         self.overlay.display()
 
+        # Transition Overlay
         if self.player.sleep:
             self.transition.play(dt)
 
