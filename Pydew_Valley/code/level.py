@@ -31,7 +31,7 @@ class Level:
 
         # Sky
         self.rain = Rain(self.all_sprites)
-        self.raining = True
+        self.raining = False
         self.soil_layer.raining = self.raining
 
         # Setup
