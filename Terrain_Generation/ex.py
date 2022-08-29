@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 from perlin_noise import PerlinNoise
 
-noise = PerlinNoise(octaves=3)
+noise = PerlinNoise(octaves=0.2)
 xpix, ypix = 1000, 1000
+xxpix, yypix = 100, 100
 
-pic = [[noise([i/xpix, j/ypix]) for j in range(xpix)] for i in range(ypix)]
+pic = [[noise([i/xxpix, j/yypix]) for j in range(xpix)] for i in range(ypix)]
 for row_index, row in enumerate(pic):
     for col_index, col in enumerate(row):
 
@@ -23,9 +24,9 @@ for row_index, row in enumerate(pic):
                 pic[row_index][col_index] = (255,255,255) # Snow
 
         if col > 0:
-            if col <= 0.1320:
+            if col <= 0.0920:
                 pic[row_index][col_index] = (23,65,117) # Light Blue
-            elif col <= 0.2080:
+            elif col <= 0.1980:
                 pic[row_index][col_index] = (19,52,97) # Blue
             else:#elif col < 0.0012:
                 pic[row_index][col_index] = (16,44,85) # Dark Blue
