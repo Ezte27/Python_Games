@@ -8,7 +8,7 @@ FPS = 30
 
 BLACK = (0, 0, 0)
 
-PARTICLE_RADIUS = 5
+PARTICLE_RADIUS = 10
 PARTICLE_RANGE = PARTICLE_RADIUS * 40
 PARTICLE_MASS = 0.01 # kg
 
@@ -39,8 +39,8 @@ pygame.display.set_caption(SCREEN_CAPTION)
 
 class Particle:
     def __init__(self, color, range, mass, pos=()) -> None:
-        self.w = PARTICLE_RADIUS*1.5
-        self.h = PARTICLE_RADIUS*1.5
+        self.w = PARTICLE_RADIUS*1.01
+        self.h = PARTICLE_RADIUS*1.01
         self.color = color
         self.mass = mass
         
@@ -62,12 +62,23 @@ class Particle:
             particles_in_range.append(particle) if self.range_circle.colliderect(particle.rect) else None
         return particles_in_range
     
-    # def interact(self, particles_in_range):
-    #     for particle in particles_in_range:
-    #         if self.rect.collidepoint(particle.rect.left) or self.rect.collidepoint(particle.rect.right): # horizontal collision
-    #             particle.vel_x *= -1
-    #         if self.rect.collidepoint(particle.rect.top) or self.rect.collidepoint(particle.rect.bottom): # vertical collision
-    #             particle.vel_y *= -1
+    def interact(self, particles_in_range):
+        for particle in particles_in_range:
+            if self.rect.colliderect(particle.rect):
+                if self.direction.x > 0:
+                    self.rect.midright = particle.rect.midleft
+                elif self.direction.x < 0:
+                    self.rect.midleft = particle.rect.midright
+                else:
+                    pass
+            
+            if self.rect.colliderect(particle.rect):
+                if self.direction.y > 0:
+                    self.rect.midbottom = particle.rect.midtop
+                elif self.direction.y < 0:
+                    self.rect.midtop = particle.rect.midbottom
+                else:
+                    pass
 
     def attract_or_repel(self, color):
         a = True if color in color_attributes_attract[self.color] else False
@@ -101,7 +112,7 @@ class Particle:
 
     def move(self, dt, particles):
         particles_in_range = self.find_particles_in_range(particles)
-        # self.interact(particles_in_range)
+        #self.interact(particles_in_range)
         for particle in particles_in_range:
             if self.attract_or_repel(particle.color)[0]:
                 self.attract(particle)
@@ -124,7 +135,7 @@ class Particle:
         self.move(dt, particles)
         self.draw(screen)
 
-particles = [Particle('blue', PARTICLE_RANGE, PARTICLE_MASS, pos=(300, 300)), Particle('red', PARTICLE_RANGE, PARTICLE_MASS, pos=(280, 280))]#[Particle(choice(COLORS), PARTICLE_RANGE, PARTICLE_MASS) for i in range(0, PARTICLE_QUANTITY)]
+particles = [Particle('blue', PARTICLE_RANGE, PARTICLE_MASS, pos=(300, 300)), Particle('red', PARTICLE_RANGE, PARTICLE_MASS, pos=(260, 260))]#[Particle(choice(COLORS), PARTICLE_RANGE, PARTICLE_MASS) for i in range(0, PARTICLE_QUANTITY)]
 
 dt = 0.001
 running = True
