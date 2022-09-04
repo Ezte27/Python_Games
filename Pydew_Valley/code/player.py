@@ -105,19 +105,19 @@ class Player(pygame.sprite.Sprite):
 
         if (not self.timers['tool_use'].active) and (not self.sleep):
             # Directions
-            if keys[pygame.K_w]:
+            if keys[pygame.K_w] or keys[pygame.K_UP]:
                 self.direction.y = -1
                 self.status = 'up'
-            elif keys[pygame.K_s]:
+            elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                 self.direction.y = 1
                 self.status = 'down'
             else:
                 self.direction.y = 0
 
-            if keys[pygame.K_d]:
+            if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self.direction.x = 1
                 self.status = 'right'
-            elif keys[pygame.K_a]:
+            elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
                 self.direction.x = -1
                 self.status = 'left'
             else:
