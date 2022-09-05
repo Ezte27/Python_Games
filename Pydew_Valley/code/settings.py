@@ -5,8 +5,8 @@ TOOLS = ['hoe', 'axe', 'water'] # All the tools available in the game (not neces
 SEEDS = ['corn', 'tomato'] # All the seeds available in the game
 
 # Screen
-SCREEN_WIDTH = 800#1366
-SCREEN_HEIGHT = 600#768
+SCREEN_WIDTH = 1366#800
+SCREEN_HEIGHT = 768#600
 SCREEN_CAPTION = 'PYDEW VALLEY'
 TILE_SIZE = 64
 
@@ -45,4 +45,15 @@ LAYERS = {
 APPLE_POS = {
     'Small': [(18, 17), (30, 37), (12, 50), (30,45), (20,30), (30,10)],
     'Large': [(30,24), (60,65), (50,50), (16,40), (45,50), (42,70)]
+}
+
+# Plants
+PLANT_GROW_SPEED = {
+    'corn': 1,
+    'tomato': 0.7
+}
+
+PLANT_Y_OFFSET = {
+    'corn': -16,
+    'tomato': -8
 }

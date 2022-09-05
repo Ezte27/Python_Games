@@ -27,7 +27,7 @@ class Level:
         self.cwd = os.getcwd()
 
         # Soil
-        self.soil_layer = SoilLayer(self.all_sprites)
+        self.soil_layer = SoilLayer(self.all_sprites, self.collision_sprites)
 
         # Sky
         self.rain = Rain(self.all_sprites)
@@ -94,14 +94,17 @@ class Level:
                     apple.kill()
                 tree.create_fruit()
 
-        # Soil
-        self.soil_layer.remove_water()
-
         # Raining
         self.raining = randint(0, 10) > 7
         self.soil_layer.raining = self.raining
         if self.raining:
             self.soil_layer.water_all()
+        
+        # Plants
+        self.soil_layer.update_plants()
+
+        # Soil (first check for watered soil in update_plants() before removing the water)
+        self.soil_layer.remove_water()
 
     def run(self, dt):
         self.display_surface.fill('black')
