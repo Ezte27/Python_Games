@@ -5,7 +5,7 @@ from support import import_folder
 from settings import *
 from player import Player
 from overlay import Overlay
-from sprites import Generic, Water, WildFlower, Tree, Interaction
+from sprites import Generic, Water, WildFlower, Tree, Interaction, Particle
 from transition import Transition
 from soil import SoilLayer
 from sky import Rain
@@ -85,6 +85,17 @@ class Level:
     def player_add_item(self, item, n = 1):
         self.player.item_inventory[item] += n
     
+    def plant_collision(self):
+        if self.soil_layer.plant_sprites:
+            for plant in self.soil_layer.plant_sprites.sprites():
+                if plant.harvestable and plant.rect.colliderect(self.player.hitbox):
+                    self.player_add_item(plant.plant_type)
+                    plant.kill()
+                    Particle(plant.rect.topleft, plant.image, self.all_sprites, LAYERS['main'])
+                    x = plant.rect.centerx // TILE_SIZE
+                    y = plant.rect.centery // TILE_SIZE
+                    self.soil_layer.grid[y][x].remove('P')
+    
     def reset_day(self):
 
         # Trees
@@ -97,8 +108,8 @@ class Level:
         # Raining
         self.raining = randint(0, 10) > 7
         self.soil_layer.raining = self.raining
-        if self.raining:
-            self.soil_layer.water_all()
+        # if self.raining:
+        #     self.soil_layer.water_all()
         
         # Plants
         self.soil_layer.update_plants()
@@ -114,6 +125,8 @@ class Level:
         # Rain
         if self.raining:
             self.rain.update()
+            self.soil_layer.water_all() # Water all soil plots
+        self.plant_collision()
 
         self.overlay.display()
 
