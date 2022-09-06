@@ -8,7 +8,7 @@ from overlay import Overlay
 from sprites import Generic, Water, WildFlower, Tree, Interaction, Particle
 from transition import Transition
 from soil import SoilLayer
-from sky import Rain
+from sky import Rain, Sky
 from pytmx.util_pygame import load_pygame
 
 class Level:
@@ -31,6 +31,7 @@ class Level:
 
         # Sky
         self.rain = Rain(self.all_sprites)
+        self.sky = Sky()
         self.raining = False
         self.soil_layer.raining = self.raining
 
@@ -117,6 +118,9 @@ class Level:
         # Soil (first check for watered soil in update_plants() before removing the water)
         self.soil_layer.remove_water()
 
+        # Sky
+        self.sky.start_color = [255, 255, 255]
+
     def run(self, dt):
         self.display_surface.fill('black')
         self.all_sprites.customize_draw(self.player) # The draw function from pygame.sprite.Group()
@@ -127,6 +131,9 @@ class Level:
             self.rain.update()
             self.soil_layer.water_all() # Water all soil plots
         self.plant_collision()
+
+        # Daytime
+        self.sky.display(dt)
 
         self.overlay.display()
 

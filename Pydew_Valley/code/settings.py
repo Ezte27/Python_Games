@@ -58,3 +58,6 @@ PLANT_Y_OFFSET = {
     'corn': -16,
     'tomato': -8
 }
+
+# Daytime
+DAYTIME_SPEED = 20 # The speed at which the day starts darkening
