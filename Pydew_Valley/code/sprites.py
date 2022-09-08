@@ -82,6 +82,10 @@ class Tree(Generic):
 
         self.player_add = player_add
 
+        # Sounds
+        self.axe_sound = pygame.mixer.Sound(f"{os.getcwd()}{AXE_SOUND_PATH}")
+        self.axe_sound.set_volume(AXE_SOUND_VOLUME)
+
     def damage(self):
         # Damaging the tree
         self.health -= 1
@@ -97,6 +101,9 @@ class Tree(Generic):
             )
             self.player_add('apple')
             random_apple.kill()
+        
+        # Play axe sound
+        self.axe_sound.play()
     
     def check_death(self):
         if self.health <= 0:

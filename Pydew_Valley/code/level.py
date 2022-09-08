@@ -45,6 +45,16 @@ class Level:
         self.menu = Menu(self.player, self.toggle_shop)
         self.shop_active = False
 
+        # Sounds
+        self.success_sound = pygame.mixer.Sound(f"{os.getcwd()}{SUCCESS_SOUND_PATH}")
+        self.success_sound.set_volume(SUCCESS_SOUND_VOLUME)
+
+        self.bg_music = pygame.mixer.Sound(f"{os.getcwd()}{BG_MUSIC_SOUND_PATH}")
+        self.bg_music.set_volume(BG_MUSIC_SOUND_VOLUME)
+
+        # Background Music
+        self.bg_music.play(loops = -1)
+
     def setup(self):
         tmx_data = load_pygame(f"{self.cwd}/data/map.tmx")
 
@@ -91,7 +101,9 @@ class Level:
                 Interaction((obj.x, obj.y), (obj.width, obj.height), [self.interaction_sprites], obj.name)
     
     def player_add_item(self, item, n = 1):
+
         self.player.inventory[item] += n
+        self.success_sound.play()
     
     def toggle_shop(self):
 

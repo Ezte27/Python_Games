@@ -89,3 +89,23 @@ PURCHASE_PRICES = {
     'corn_seed': 4,
     'tomato_seed': 4
 }
+
+# SOUNDS
+
+AXE_SOUND_PATH   = "/audio/axe.wav"
+AXE_SOUND_VOLUME = 0.8 # 80% of the actual file volume
+
+SUCCESS_SOUND_PATH   = "/audio/success.wav"
+SUCCESS_SOUND_VOLUME = 0.8 
+
+HOE_SOUND_PATH   = "/audio/hoe.wav"
+HOE_SOUND_VOLUME = 0.2
+
+WATERING_SOUND_PATH   = "/audio/watering.wav"
+WATERING_SOUND_VOLUME = 0.3
+
+PLANTING_SOUND_PATH   = "/audio/planting.wav"
+PLANTING_SOUND_VOLUME = 0.1
+
+BG_MUSIC_SOUND_PATH   = "/audio/bg1_music.wav"
+BG_MUSIC_SOUND_VOLUME = 0.6
