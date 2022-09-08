@@ -60,7 +60,7 @@ PLANT_Y_OFFSET = {
 }
 
 # Daytime and Weather
-DAYTIME_SPEED = 1 # The speed at which the day starts darkening
+DAYTIME_SPEED = 2 # The speed at which the day starts darkening
 RAIN_PROBABILITY = 3 # 30% chance of precipitation
 
 # Fonts Setup
@@ -97,7 +97,7 @@ AXE_SOUND_PATH   = "/audio/axe.wav"
 AXE_SOUND_VOLUME = 0.8 # 80% of the actual file volume
 
 SUCCESS_SOUND_PATH   = "/audio/success.wav"
-SUCCESS_SOUND_VOLUME = 0.8 
+SUCCESS_SOUND_VOLUME = 0.1
 
 HOE_SOUND_PATH   = "/audio/hoe.wav"
 HOE_SOUND_VOLUME = 0.2
