@@ -9,6 +9,7 @@ from sprites import Generic, Water, WildFlower, Tree, Interaction, Particle
 from transition import Transition
 from soil import SoilLayer
 from sky import Rain, Sky
+from menu import Menu
 from pytmx.util_pygame import load_pygame
 
 class Level:
@@ -39,6 +40,10 @@ class Level:
         self.setup()
         self.overlay = Overlay(self.player)
         self.transition = Transition(self.reset_day, self.player)
+
+        # Shop
+        self.menu = Menu(self.player, self.toggle_shop)
+        self.shop_active = False
 
     def setup(self):
         tmx_data = load_pygame(f"{self.cwd}/data/map.tmx")
@@ -79,12 +84,22 @@ class Level:
         # Player
         for obj in tmx_data.get_layer_by_name('Player'):
             if obj.name == 'Start':
-                self.player = Player((obj.x, obj.y), [self.all_sprites], self.collision_sprites, self.tree_sprites, interaction = self.interaction_sprites, soil_layer = self.soil_layer)
-            if obj.name == "Bed":
+                self.player = Player((obj.x, obj.y), [self.all_sprites], self.collision_sprites, self.tree_sprites, interaction = self.interaction_sprites, soil_layer = self.soil_layer, toggle_shop = self.toggle_shop)
+            elif obj.name == "Bed":
+                Interaction((obj.x, obj.y), (obj.width, obj.height), [self.interaction_sprites], obj.name)
+            elif obj.name == "Trader":
                 Interaction((obj.x, obj.y), (obj.width, obj.height), [self.interaction_sprites], obj.name)
     
     def player_add_item(self, item, n = 1):
-        self.player.item_inventory[item] += n
+        self.player.inventory[item] += n
+    
+    def toggle_shop(self):
+
+        # Toggle the shop
+        self.shop_active = not self.shop_active
+
+        # Activate Timer when opening the shop to ignore input for some time
+        self.menu.move_timer.activate() if (not self.menu.move_timer.active) and (self.shop_active) else None
     
     def plant_collision(self):
         if self.soil_layer.plant_sprites:
@@ -122,15 +137,23 @@ class Level:
         self.sky.start_color = [255, 255, 255]
 
     def run(self, dt):
+
+        # Drawing Logic
         self.display_surface.fill('black')
         self.all_sprites.customize_draw(self.player) # The draw function from pygame.sprite.Group()
-        self.all_sprites.update(dt)
+        
+        # Updates
+        if self.shop_active:
+            self.menu.update()
 
-        # Rain
-        if self.raining:
-            self.rain.update()
-            self.soil_layer.water_all() # Water all soil plots
-        self.plant_collision()
+        if not self.shop_active:
+            self.all_sprites.update(dt)
+            self.plant_collision()
+
+            # Rain
+            if self.raining:
+                self.rain.update()
+                self.soil_layer.water_all() # Water all soil plots
 
         # Daytime
         self.sky.display(dt)

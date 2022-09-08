@@ -60,4 +60,32 @@ PLANT_Y_OFFSET = {
 }
 
 # Daytime
-DAYTIME_SPEED = 20 # The speed at which the day starts darkening
+DAYTIME_SPEED = 1 # The speed at which the day starts darkening
+
+# Fonts Setup
+FONT_SIZE = 30
+FONT_PATH = "/fonts/LycheeSoda.ttf" # Place this path after the Current Working Directory 
+
+# Shop Attributes
+MENU_WIDTH = 400
+MENU_SPACE = 10
+MENU_PADDING = 8
+SHOP_OPTIONS = ['wood', 'apple', 'corn_seed', 'tomato_seed', 'corn', 'tomato']
+
+SALE_PRICES = {
+    'wood': 4,
+    'apple': 4,
+    'corn': 4,
+    'tomato': 4,
+    'corn_seed': 4,
+    'tomato_seed': 4
+}
+
+PURCHASE_PRICES = {
+    'wood': 4,
+    'apple': 4,
+    'corn': 4,
+    'tomato': 4,
+    'corn_seed': 4,
+    'tomato_seed': 4
+}

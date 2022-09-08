@@ -134,7 +134,7 @@ class SoilLayer:
                 if "W" in cell:
                     cell.remove('W')
     
-    def plant_seed(self, target_pos, seed):
+    def plant_seed(self, target_pos, seed) -> bool:
         for soil_sprite in self.soil_sprites.sprites():
             if soil_sprite.rect.collidepoint(target_pos):
 
@@ -144,6 +144,8 @@ class SoilLayer:
                 if 'P' not in self.grid[y][x]:
                     self.grid[y][x].append('P') # 'P for Plant
                     Plant(seed, [self.all_sprites, self.plant_sprites, self.collision_sprites], soil_sprite, self.check_watered)
+                    return True # True, the seed was planted
+        return False # False, the seed was not able to be planted
 
     def check_watered(self, pos):
         x = pos[0] // TILE_SIZE
