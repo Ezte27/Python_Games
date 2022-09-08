@@ -134,7 +134,7 @@ class Level:
                 tree.create_fruit()
 
         # Raining
-        self.raining = randint(0, 10) > 7
+        self.raining = randint(0, 10) <= RAIN_PROBABILITY
         self.soil_layer.raining = self.raining
         # if self.raining:
         #     self.soil_layer.water_all()

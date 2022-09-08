@@ -59,8 +59,9 @@ PLANT_Y_OFFSET = {
     'tomato': -8
 }
 
-# Daytime
+# Daytime and Weather
 DAYTIME_SPEED = 1 # The speed at which the day starts darkening
+RAIN_PROBABILITY = 3 # 30% chance of precipitation
 
 # Fonts Setup
 FONT_SIZE = 30
