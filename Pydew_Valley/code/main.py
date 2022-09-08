@@ -6,6 +6,8 @@ from level import Level
 class Game:
     def __init__(self) -> None:
         pygame.init()
+        pygame.font.init()
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption(SCREEN_CAPTION)
         self.clock = pygame.time.Clock()
