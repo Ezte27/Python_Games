@@ -60,7 +60,7 @@ PLANT_Y_OFFSET = {
 }
 
 # Daytime and Weather
-DAYTIME_SPEED = 10 # The speed at which the day starts darkening
+DAYTIME_SPEED = 1.5 # The speed at which the day starts darkening
 DAY_NIGHT_DURATION = 40000 # In Milliseconds
 RAIN_PROBABILITY = 3 # 30% chance of precipitation
 
