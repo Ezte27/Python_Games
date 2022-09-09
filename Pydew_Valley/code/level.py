@@ -152,7 +152,7 @@ class Level:
         self.soil_layer.remove_water()
 
         # Sky
-        self.sky.start_color = [255, 255, 255]
+        self.sky.reset()
 
     def run(self, dt):
 
