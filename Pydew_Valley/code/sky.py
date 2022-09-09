@@ -102,7 +102,6 @@ class Sky:
                     self.sunrise = False
                     self.sunset  = True
                     self.timer.activate()
-                    print("timer")
 
         self.full_surf.fill(self.start_color)
         self.display_surface.blit(self.full_surf, (0,0), special_flags= pygame.BLEND_RGBA_MULT) # dont show white FLAG
