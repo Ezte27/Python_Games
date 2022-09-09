@@ -13,3 +13,4 @@
 - [COMPLETE]Fix the issue where after cutting a tree, when the player moves, the player position is changed drastically.
 - expand the map, more biomes, etc.
 - [COMPLETE]Fix the house wall collisions
+- Random Terrain Generation
