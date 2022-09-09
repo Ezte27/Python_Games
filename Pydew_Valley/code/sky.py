@@ -74,6 +74,17 @@ class Sky:
         # Timers
         self.timer = Timer((1/DAYTIME_SPEED) * DAY_NIGHT_DURATION)
 
+    def change_direction(self):
+        self.sunrise = not self.sunrise
+        self.sunset  = not self.sunset
+    
+    def reset(self):
+        self.timer.deactivate()
+        self.sunset = True
+        self.sunrise = False
+        self.color_index = [0, 0, 0]
+        self.start_color = [255, 255, 255]
+
     def display(self, dt):
         self.timer.update()
 
@@ -86,10 +97,8 @@ class Sky:
                         self.color_index[index] = 1
                     
                 if all(self.color_index):
-                    self.sunrise = True
-                    self.sunset  = False
+                    self.change_direction()
                     self.timer.activate()
-                    print("timer")
             
             elif self.sunrise:
                 for index, value in enumerate(self.end_color):
@@ -99,8 +108,7 @@ class Sky:
                         self.color_index[index] = 0
 
                 if not(all(self.color_index)):
-                    self.sunrise = False
-                    self.sunset  = True
+                    self.change_direction()
                     self.timer.activate()
 
         self.full_surf.fill(self.start_color)
