@@ -5,18 +5,34 @@ from settings import *
 from timer import Timer
 
 class Generic(pygame.sprite.Sprite):
-    def __init__(self, pos, surf, groups, z=LAYERS['main']) -> None:
+    def __init__(self, pos, surf, groups, z=LAYERS['main'], name=None) -> None:
         super().__init__(groups)
         self.image = surf
         self.rect = self.image.get_rect(topleft = pos)
         self.z = z
-        self.hitbox = self.rect.copy().inflate(-self.rect.width * 0.2, -self.rect.height * 0.75)
+        self.hitbox = self.rect.copy().inflate(-self.rect.width * 0.2, -self.rect.height * 0.35)
+        self.name = name
 
 class Interaction(Generic):
     def __init__(self, pos, size, groups, name) -> None:
         surf = pygame.Surface(size)
         super().__init__(pos, surf, groups)
         self.name = name
+
+class WildFlower(Generic):
+    def __init__(self, pos, surf, groups) -> None:
+        super().__init__(pos, surf, groups)
+        self.hitbox = self.rect.copy().inflate(-20, -self.rect.height * 0.9)
+
+class HouseWall(Generic):
+    def __init__(self, pos, surf, groups, name) -> None:
+        super().__init__(pos, surf, groups, name=name)
+        self.hitbox = self.rect.copy().inflate(-self.rect.width * 0.5, -self.rect.height * 0.35)
+        if name == "HouseWallsRight":
+            self.hitbox.midleft = self.rect.midleft
+        
+        elif name == "HouseWallsLeft":
+            self.hitbox.midright = self.rect.midright
 
 class Water(Generic):
     def __init__(self, pos, frames, groups) -> None:
@@ -40,11 +56,6 @@ class Water(Generic):
     
     def update(self, dt):
         self.animate(dt)
-
-class WildFlower(Generic):
-    def __init__(self, pos, surf, groups) -> None:
-        super().__init__(pos, surf, groups)
-        self.hitbox = self.rect.copy().inflate(-20, -self.rect.height * 0.9)
 
 class Particle(Generic):
     def __init__(self, pos, surf, groups, z, duration = 200) -> None:
@@ -110,7 +121,9 @@ class Tree(Generic):
             self.player_add('wood', n = randint(1, 4) if self.name == 'Small' else randint(3, 8))
             self.image = self.stump_surf
             self.rect = self.image.get_rect(midbottom = self.rect.midbottom)
-            self.hitbox = self.rect.copy().inflate(-10, -self.rect.height * 0.6)
+            hitbox_midbottom = self.hitbox.midbottom # Take the full tree hitbox midbottom position
+            self.hitbox = self.rect.copy().inflate(-10, -self.rect.height  * 0.6)
+            self.hitbox.midbottom = hitbox_midbottom # Place the midbottom of the new hitbox in the midbottom of the full tree hitbox to avoid collision problems with the player
             self.isAlive = False
 
     def create_fruit(self):

@@ -5,7 +5,7 @@ from support import import_folder
 from settings import *
 from player import Player
 from overlay import Overlay
-from sprites import Generic, Water, WildFlower, Tree, Interaction, Particle
+from sprites import Generic, Water, WildFlower, Tree, Interaction, Particle, HouseWall
 from transition import Transition
 from soil import SoilLayer
 from sky import Rain, Sky
@@ -63,9 +63,15 @@ class Level:
             for x, y, surf in tmx_data.get_layer_by_name(layer).tiles():
                 Generic((x * TILE_SIZE, y * TILE_SIZE), surf, self.all_sprites, LAYERS['house bottom'])
         
-        for layer in ['HouseWalls', 'HouseFurnitureTop']:
+        for layer in ["HouseWalls", "HouseFurnitureTop"]: # Put "HouseWalls first or else for some reason, half of the bed will no be seen" (maybe because they have the same y position)
             for x, y, surf in tmx_data.get_layer_by_name(layer).tiles():
                 Generic((x * TILE_SIZE, y * TILE_SIZE), surf, [self.all_sprites], LAYERS['main'])
+        
+        for x, y, surf in tmx_data.get_layer_by_name('HouseWallsLeft').tiles():
+            HouseWall((x * TILE_SIZE, y * TILE_SIZE), surf, [self.all_sprites, self.collision_sprites], name = 'HouseWallsLeft')
+
+        for x, y, surf in tmx_data.get_layer_by_name('HouseWallsRight').tiles():
+            HouseWall((x * TILE_SIZE, y * TILE_SIZE), surf, [self.all_sprites, self.collision_sprites], name = 'HouseWallsRight')
 
         # Fence
         for x, y, surf in tmx_data.get_layer_by_name('Fence').tiles():
@@ -194,8 +200,13 @@ class CameraGroup(pygame.sprite.Group):
                     offset_rect.center -= self.offset
                     self.display_surface.blit(sprite.image, offset_rect)
 
-                    # if sprite == player:
-                    #     pygame.draw.rect(self.display_surface, 'red', offset_rect, 5)
-                    #     hitbox_rect = player.hitbox.copy()
-                    #     hitbox_rect.center = offset_rect.center
-                    #     pygame.draw.rect(self.display_surface, 'green', hitbox_rect,5)
+                    # DEBUG
+                    if sprite == player:
+                        hitbox_rect = player.hitbox.copy()
+                        hitbox_rect.center = offset_rect.center
+                        pygame.draw.rect(self.display_surface, 'green', hitbox_rect,3)
+
+                    # if hasattr(sprite, "name") and sprite.name == "Small":
+                    #     hitbox = sprite.hitbox.copy()
+                    #     hitbox.center = offset_rect.center
+                    #     pygame.draw.rect(self.display_surface, "Red", hitbox, 3)
