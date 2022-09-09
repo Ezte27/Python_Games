@@ -40,7 +40,8 @@ LAYERS = {
     'main': 7,
     'house top': 8,
     'fruit': 9,
-    'rain drops': 10,
+    'house roof': 10,
+    'rain drops': 11
 }
 
 APPLE_POS = {
@@ -58,6 +59,9 @@ PLANT_Y_OFFSET = {
     'corn': -16,
     'tomato': -8
 }
+
+# House
+HOUSE_ROOF_ALPHA = 120
 
 # Daytime and Weather
 DAYTIME_SPEED = 1.5 # The speed at which the day starts darkening

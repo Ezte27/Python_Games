@@ -5,7 +5,8 @@ from support import import_folder
 from settings import *
 from player import Player
 from overlay import Overlay
-from sprites import Generic, Water, WildFlower, Tree, Interaction, Particle, HouseWall
+from sprites import Generic, Water, WildFlower, Tree, Interaction, Particle, HouseWall, HouseRoof
+from entities import Entity
 from transition import Transition
 from soil import SoilLayer
 from sky import Rain, Sky
@@ -23,6 +24,7 @@ class Level:
         self.collision_sprites = pygame.sprite.Group()
         self.tree_sprites = pygame.sprite.Group()
         self.interaction_sprites = pygame.sprite.Group()
+        self.houseRoof_sprites = pygame.sprite.Group()
 
         # Extra
         self.cwd = os.getcwd()
@@ -72,6 +74,9 @@ class Level:
 
         for x, y, surf in tmx_data.get_layer_by_name('HouseWallsRight').tiles():
             HouseWall((x * TILE_SIZE, y * TILE_SIZE), surf, [self.all_sprites, self.collision_sprites], name = 'HouseWallsRight')
+        
+        for x, y, surf in tmx_data.get_layer_by_name('HouseRoof').tiles():
+            HouseRoof((x * TILE_SIZE, y * TILE_SIZE), surf, [self.all_sprites, self.houseRoof_sprites])
 
         # Fence
         for x, y, surf in tmx_data.get_layer_by_name('Fence').tiles():
@@ -105,6 +110,9 @@ class Level:
                 Interaction((obj.x, obj.y), (obj.width, obj.height), [self.interaction_sprites], obj.name)
             elif obj.name == "Trader":
                 Interaction((obj.x, obj.y), (obj.width, obj.height), [self.interaction_sprites], obj.name)
+        
+        # Entities
+        # Entity((900, 900), pygame.image.load(f"{os.getcwd()}/graphics/mobs/pig/Pig1.png").convert_alpha(), [self.all_sprites])
     
     def player_add_item(self, item, n = 1):
 
@@ -153,6 +161,13 @@ class Level:
 
         # Sky
         self.sky.reset()
+    
+    def check_house_roof_visibility(self) -> bool:
+        '''Return True if player collides with house roof'''
+        for sprite in self.houseRoof_sprites.sprites():
+            if self.player.hitbox.colliderect(sprite.hitbox):
+                return True
+        return False
 
     def run(self, dt):
 
@@ -178,6 +193,23 @@ class Level:
 
         self.overlay.display()
 
+        # House Roof
+        if self.check_house_roof_visibility():
+            for sprite in self.houseRoof_sprites.sprites():
+                sprite.image.set_alpha(HOUSE_ROOF_ALPHA)
+        else:
+            if self.houseRoof_sprites.sprites()[0].image.get_alpha() == HOUSE_ROOF_ALPHA:
+                for sprite in self.houseRoof_sprites.sprites():
+                    sprite.image.set_alpha(255)
+
+        # if self.check_house_roof_visibility():
+        #     for sprite in self.all_sprites.sprites():
+        #         if hasattr(sprite, 'name') and sprite.name == "HouseRoof":
+        #             self.all_sprites.remove(sprite)
+            
+        # else:
+        #     self.all_sprites.add(self.houseRoof_sprites.sprites())
+
         # Transition Overlay
         if self.player.sleep:
             self.transition.play(dt)
@@ -201,10 +233,10 @@ class CameraGroup(pygame.sprite.Group):
                     self.display_surface.blit(sprite.image, offset_rect)
 
                     # DEBUG
-                    if sprite == player:
-                        hitbox_rect = player.hitbox.copy()
-                        hitbox_rect.center = offset_rect.center
-                        pygame.draw.rect(self.display_surface, 'green', hitbox_rect,3)
+                    # if sprite == player:
+                    #     hitbox_rect = player.hitbox.copy()
+                    #     hitbox_rect.center = offset_rect.center
+                    #     pygame.draw.rect(self.display_surface, 'green', hitbox_rect,3)
 
                     # if hasattr(sprite, "name") and sprite.name == "Small":
                     #     hitbox = sprite.hitbox.copy()

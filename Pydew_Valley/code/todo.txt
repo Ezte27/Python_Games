@@ -8,7 +8,7 @@
 - be able to cross a lake or river with a boat?? I guess
 - Make the trees spawn at random positions
 - [COMPLETE]Make a complete daynight cycle, that is, starts day then night and then day again. You dont have to sleep to make it day again
-- Make a roof for the houses
+- [COMPLETE]Make a roof for the houses
 - Download more background music for the game
 - [COMPLETE]Fix the issue where after cutting a tree, when the player moves, the player position is changed drastically.
 - expand the map, more biomes, etc.

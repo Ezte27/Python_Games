@@ -34,6 +34,12 @@ class HouseWall(Generic):
         elif name == "HouseWallsLeft":
             self.hitbox.midright = self.rect.midright
 
+class HouseRoof(Generic):
+    def __init__(self, pos, surf, groups) -> None:
+        super().__init__(pos, surf, groups, z=LAYERS["house roof"])
+        self.hitbox = self.rect.copy()
+        self.name = "HouseRoof"
+
 class Water(Generic):
     def __init__(self, pos, frames, groups) -> None:
         
