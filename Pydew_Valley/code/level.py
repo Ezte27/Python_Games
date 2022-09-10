@@ -41,7 +41,7 @@ class Level:
         # Setup
         self.setup()
         self.overlay = Overlay(self.player)
-        self.transition = Transition(self.reset_day, self.player)
+        self.transition = Transition(self.reset_day, self.player, self.houseRoof_sprites)
 
         # Shop
         self.menu = Menu(self.player, self.toggle_shop)
@@ -112,7 +112,7 @@ class Level:
                 Interaction((obj.x, obj.y), (obj.width, obj.height), [self.interaction_sprites], obj.name)
         
         # Entities
-        # Entity((900, 900), pygame.image.load(f"{os.getcwd()}/graphics/mobs/pig/Pig1.png").convert_alpha(), [self.all_sprites])
+        Entity((900, 900), pygame.image.load(f"{os.getcwd()}/graphics/mobs/pig/Pig1.png").convert_alpha(), [self.all_sprites])
     
     def player_add_item(self, item, n = 1):
 
@@ -195,12 +195,9 @@ class Level:
 
         # House Roof
         if self.check_house_roof_visibility():
-            for sprite in self.houseRoof_sprites.sprites():
-                sprite.image.set_alpha(HOUSE_ROOF_ALPHA)
+            self.transition.play_house_roof(dt, 1)
         else:
-            if self.houseRoof_sprites.sprites()[0].image.get_alpha() == HOUSE_ROOF_ALPHA:
-                for sprite in self.houseRoof_sprites.sprites():
-                    sprite.image.set_alpha(255)
+            self.transition.play_house_roof(dt, 0)
 
         # if self.check_house_roof_visibility():
         #     for sprite in self.all_sprites.sprites():
@@ -212,7 +209,7 @@ class Level:
 
         # Transition Overlay
         if self.player.sleep:
-            self.transition.play(dt)
+            self.transition.play_sleep(dt)
 
 class CameraGroup(pygame.sprite.Group):
     def __init__(self) -> None:
