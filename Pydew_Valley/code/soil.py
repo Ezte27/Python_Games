@@ -25,7 +25,7 @@ class Plant(pygame.sprite.Sprite):
 
         # Plant Setup
         self.plant_type = plant_type
-        self.frames = import_folder(f'{os.getcwd()}/graphics/fruit/{self.plant_type}')
+        self.frames = import_folder(f'{os.getcwd()}/graphics/crops/{self.plant_type}/plant')
         self.soil = soil
         self.check_watered = check_watered
         self.harvestable = False
@@ -42,7 +42,7 @@ class Plant(pygame.sprite.Sprite):
         self.z = LAYERS['ground plant']
     
     def grow(self):
-        if self.check_watered(self.rect.center):
+        if self.check_watered(self.rect.midbottom):
             self.age += self.grow_speed # * dt
 
             if int(self.age) > 0:
@@ -131,9 +131,9 @@ class SoilLayer:
             if soil_sprite.rect.collidepoint(point):
                 x = soil_sprite.rect.x // TILE_SIZE
                 y = soil_sprite.rect.y // TILE_SIZE
-                self.grid[y][x].append("W")
-
-                WaterTile((soil_sprite.rect.topleft), choice(self.water_surfs), [self.all_sprites, self.water_sprites])
+                if 'W' not in self.grid[y][x]:
+                    self.grid[y][x].append("W")
+                    WaterTile((soil_sprite.rect.topleft), choice(self.water_surfs), [self.all_sprites, self.water_sprites])
     
     def remove_water(self):
         for sprite in self.water_sprites.sprites():

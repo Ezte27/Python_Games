@@ -134,8 +134,8 @@ class Level:
                     self.player_add_item(plant.plant_type)
                     plant.kill()
                     Particle(plant.rect.topleft, plant.image, self.all_sprites, LAYERS['main'])
-                    x = plant.rect.centerx // TILE_SIZE
-                    y = plant.rect.centery // TILE_SIZE
+                    x = plant.rect.midbottom[0] // TILE_SIZE
+                    y = plant.rect.midbottom[1] // TILE_SIZE
                     self.soil_layer.grid[y][x].remove('P')
     
     def reset_day(self):
@@ -150,8 +150,6 @@ class Level:
         # Raining
         self.raining = randint(0, 10) <= RAIN_PROBABILITY
         self.soil_layer.raining = self.raining
-        # if self.raining:
-        #     self.soil_layer.water_all()
         
         # Plants
         self.soil_layer.update_plants()

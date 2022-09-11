@@ -19,7 +19,7 @@ ANIMATE_PLAYER_SPEED = 4
 
 OVERLAY_POSITIONS = {
     'tool': (40, SCREEN_HEIGHT - 15),
-    'seed': (75, SCREEN_HEIGHT - 5)
+    'seed': (96, SCREEN_HEIGHT - 5)
 }
 
 PLAYER_TOOL_OFFSET = {
@@ -52,12 +52,16 @@ APPLE_POS = {
 # Plants
 PLANT_GROW_SPEED = {
     'corn': 1,
-    'tomato': 0.7
+    'tomato': 0.7,
+    'wheat': 1,
+    'carrot': 1
 }
 
 PLANT_Y_OFFSET = {
-    'corn': -16,
-    'tomato': -8
+    'corn': -6,
+    'tomato': -8,
+    'wheat': -16,
+    'carrot': -8
 }
 
 # House
@@ -66,7 +70,7 @@ HOUSE_ROOF_ALPHA = 120
 # Daytime and Weather
 DAYTIME_SPEED = 1.5 # The speed at which the day starts darkening
 DAY_NIGHT_DURATION = 40000 # In Milliseconds
-RAIN_PROBABILITY = 3 # 30% chance of precipitation
+RAIN_PROBABILITY = 10 # 30% chance of precipitation
 
 # Fonts Setup
 FONT_SIZE = 30
