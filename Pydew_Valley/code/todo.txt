@@ -1,11 +1,13 @@
 [WORKING]
 [COMPLETE]
 
+- add more crops
+- add a boat
 - start menu
 - inventory menu
 - crafting menu
 - make an entity class for placing animals on the map at random
-- be able to cross a lake or river with a boat?? I guess
+- Make the boat an interaction sprite so that when you interact with it, it puts you inside and you are able to cross the water
 - Make the trees spawn at random positions
 - [COMPLETE]Make a complete daynight cycle, that is, starts day then night and then day again. You dont have to sleep to make it day again
 - [COMPLETE]Make a roof for the houses
@@ -13,4 +15,4 @@
 - [COMPLETE]Fix the issue where after cutting a tree, when the player moves, the player position is changed drastically.
 - expand the map, more biomes, etc.
 - [COMPLETE]Fix the house wall collisions
-- Random Terrain Generation
+- Random Terrain Generation (well ... )
