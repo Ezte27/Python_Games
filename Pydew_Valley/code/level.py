@@ -112,7 +112,7 @@ class Level:
                 Interaction((obj.x, obj.y), (obj.width, obj.height), [self.interaction_sprites], obj.name)
         
         # Entities
-        Entity((900, 900), pygame.image.load(f"{os.getcwd()}/graphics/mobs/pig/Pig1.png").convert_alpha(), [self.all_sprites])
+        # Entity((900, 900), pygame.image.load(f"{os.getcwd()}/graphics/mobs/pig/Pig1.png").convert_alpha(), [self.all_sprites])
     
     def player_add_item(self, item, n = 1):
 
