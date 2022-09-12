@@ -27,7 +27,7 @@ class Game:
             
             distance = self.get_distance(player)
             if distance < player.last_distance:
-                genomes[index][1].fitness += 1
+                genomes[index][1].fitness += 6
             else:
                 genomes[index][1].fitness -= 0.5
             
@@ -39,7 +39,7 @@ class Game:
             running = False
 
     def get_inputs(self, player):
-        return (player.rect.centerx, player.rect.centery, self.prey.rect.centerx, self.prey.rect.centery)
+        return (player.rect.centerx - self.prey.rect.centerx, player.rect.centery - self.prey.rect.centery)
 
     def get_distance(self, player):
         return math.sqrt((player.rect.centerx - self.prey.rect.centerx)**2 + (player.rect.centery - self.prey.rect.centery)**2)
@@ -54,7 +54,7 @@ class Game:
         a = False
         for index, player in enumerate(self.players):
             if player.rect.colliderect(self.prey.rect):
-                genomes[index][1].fitness += 10
+                genomes[index][1].fitness += 50
                 a = True
             else:
                 genomes[index][1].fitness -= 0.0005 # No Prey = BAD
@@ -70,10 +70,10 @@ class Prey:
 
 
 class Player:
-    def __init__(self, pos, color = None) -> None:
+    def __init__(self, pos = None, color = None) -> None:
 
         # General Setup
-        self.rect = pygame.Rect((pos), (PLAYER_WIDTH, PLAYER_HEIGHT))
+        self.rect = pygame.Rect((randint(0, SCREEN_WIDTH - PLAYER_WIDTH), randint(0, SCREEN_HEIGHT - PLAYER_HEIGHT)), (PLAYER_WIDTH, PLAYER_HEIGHT)) if not(pos) else pygame.Rect((pos), (PLAYER_WIDTH, PLAYER_HEIGHT))
         self.color = color if color else PLAYER_COLOR
 
         # Movement
@@ -101,7 +101,7 @@ def eval_genome(genomes, config):
 
         genome.fitness = 0
 
-        players.append(Player((0, 0)))
+        players.append(Player())
 
     screen = pygame.display.get_surface()
     start_time = pygame.time.get_ticks()
@@ -113,6 +113,7 @@ def eval_genome(genomes, config):
     while running:
         dt = clock.tick(FPS) / 1000
         time_left = pygame.time.get_ticks() - start_time
+        game.prey.rect.center = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
