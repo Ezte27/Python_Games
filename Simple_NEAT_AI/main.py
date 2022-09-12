@@ -3,6 +3,7 @@
 """
 import math
 import sys
+from tabnanny import check
 import pygame, neat, pickle
 from random import randint, choice
 from settings import *
@@ -27,16 +28,16 @@ class Game:
             
             distance = self.get_distance(player)
             if distance < player.last_distance:
-                genomes[index][1].fitness += 6
+                genomes[index][1].fitness += 3
             else:
-                genomes[index][1].fitness -= 0.5
+                if not(self.check_collision(index)):
+                    genomes[index][1].fitness -= 0.5
             
             # Update the player
             player.update(dt, distance)
         
         # Fitness update
-        if self.check_prey_player_collision(genomes):
-            running = False
+        self.check_prey_player_collision(genomes)
 
     def get_inputs(self, player):
         return (player.rect.centerx - self.prey.rect.centerx, player.rect.centery - self.prey.rect.centery)
@@ -51,14 +52,16 @@ class Game:
         pass
 
     def check_prey_player_collision(self, genomes):
-        a = False
         for index, player in enumerate(self.players):
             if player.rect.colliderect(self.prey.rect):
-                genomes[index][1].fitness += 50
-                a = True
-            else:
-                genomes[index][1].fitness -= 0.0005 # No Prey = BAD
-        return a
+                genomes[index][1].fitness += 10
+            # else:
+            #     genomes[index][1].fitness -= 0.0005 # No Prey = BAD
+    
+    def check_collision(self, index):
+        if self.players[index].rect.colliderect(self.prey.rect):
+            return True
+        return False
 
     def create_obstacles(self): # Maybe??
         pass
@@ -113,7 +116,7 @@ def eval_genome(genomes, config):
     while running:
         dt = clock.tick(FPS) / 1000
         time_left = pygame.time.get_ticks() - start_time
-        game.prey.rect.center = pygame.mouse.get_pos()
+        # game.prey.rect.center = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
