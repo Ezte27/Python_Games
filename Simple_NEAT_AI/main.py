@@ -16,7 +16,7 @@ class Game:
         self.obstacles = self.create_obstacles()
 
     def train_ai(self, genomes, config, dt):
-        
+        global running
         # Output of the network
         for index, player in enumerate(self.players):
             output = self.networks[index].activate(self.get_inputs(player))
@@ -27,15 +27,16 @@ class Game:
             
             distance = self.get_distance(player)
             if distance < player.last_distance:
-                genomes[index][1].fitness += 0.8
+                genomes[index][1].fitness += 1
             else:
-                genomes[index][1].fitness -= 0.005
+                genomes[index][1].fitness -= 0.5
             
             # Update the player
             player.update(dt, distance)
         
         # Fitness update
-        self.check_prey_player_collision(genomes)
+        if self.check_prey_player_collision(genomes):
+            running = False
 
     def get_inputs(self, player):
         return (player.rect.centerx, player.rect.centery, self.prey.rect.centerx, self.prey.rect.centery)
@@ -50,13 +51,14 @@ class Game:
         pass
 
     def check_prey_player_collision(self, genomes):
+        a = False
         for index, player in enumerate(self.players):
             if player.rect.colliderect(self.prey.rect):
-                self.prey = None # Kill the prey
                 genomes[index][1].fitness += 10
-                self.create_prey() # Create new prey
+                a = True
             else:
-                genomes[index][1].fitness -= 0.000005 # No Prey = BAD
+                genomes[index][1].fitness -= 0.0005 # No Prey = BAD
+        return a
 
     def create_obstacles(self): # Maybe??
         pass
@@ -87,7 +89,7 @@ class Player:
         self.rect.centery += self.y_vel * dt
 
 def eval_genome(genomes, config):
-    global generation
+    global generation, running
     generation += 1
 
     networks = []
@@ -107,7 +109,8 @@ def eval_genome(genomes, config):
     # Main Loop
     game = Game(networks, players)
 
-    while True:
+    running = True
+    while running:
         dt = clock.tick(FPS) / 1000
         time_left = pygame.time.get_ticks() - start_time
 
