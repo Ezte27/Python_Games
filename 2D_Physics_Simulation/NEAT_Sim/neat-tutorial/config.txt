@@ -5,8 +5,8 @@
 [NEAT]
 fitness_criterion     = mean
 fitness_threshold     = 200.0
-pop_size              = 50
-reset_on_extinction   = 0
+pop_size              = 5
+reset_on_extinction   = 1
 
 [DefaultGenome]
 num_inputs              = 4
