@@ -29,7 +29,7 @@ def eval_genomes(genomes, config):
         nets.append(net)
         players.append(Player((randint(0, SCREEN_WIDTH - PLAYER_WIDTH), randint(0, SCREEN_HEIGHT - PLAYER_HEIGHT))))
 
-        genome.fitness = 0
+        genome.fitness = 100
         ge.append(genome)
     
     run(nets, ge, players)
@@ -50,18 +50,32 @@ def run(nets, ge, players):
 
             # Get AI Output
             for i, net in enumerate(nets):
-                output = nets[i].activate(get_inputs(bg_color))
+                output = net.activate(get_inputs(bg_color))
+
+                # Update Fitness
+                mse = calculate_MSE(output, get_inputs(bg_color))
+                ge[i].fitness -= mse
+
+                # Use the output to update the color of the player
                 #print(f"\n UNCHANGED: {output}") # DEBUG
                 output = transform_output(output)
                 #print(output)
                 players[i].color = output
 
-            # Update Fitness
-            for i, genome in enumerate(ge):
-                if check_color(players[i], bg_color):
-                    genome.fitness += 10
-                else:
-                    genome.fitness -= 6
+            
+            # for i, genome in enumerate(ge):
+            #         fitness_value = check_color(players[i], bg_color)
+            #         if fitness_value == 3:
+            #             genome.fitness += 12
+
+            #         elif fitness_value == 2:
+            #             genome.fitness += 6
+                    
+            #         elif fitness_value == 1:
+            #             genome.fitness += 2
+
+            #         else:
+            #             genome.fitness -= 2
     
     else:
         start_time = 0
@@ -107,10 +121,18 @@ def run(nets, ge, players):
 
                 # Update Fitness
                 for i, genome in enumerate(ge):
-                    if check_color(players[i], bg_color):
-                        genome.fitness += 10
+                    fitness_value = check_color(players[i], bg_color)
+                    if fitness_value == 3:
+                        genome.fitness += 12
+
+                    elif fitness_value == 2:
+                        genome.fitness += 6
+                    
+                    elif fitness_value == 1:
+                        genome.fitness += 2
+
                     else:
-                        genome.fitness -= 6
+                        genome.fitness -= 1.5
             
             # Drawing
             screen.fill(bg_color)
@@ -169,10 +191,8 @@ def test_ai(genome, config):
                     player.color = transform_output(output)
 
                     # Updating accuracy
-                    if check_color(player, bg_color):
-                        correct += 1  
-                    else:
-                        print(output) # DEBUG
+                    if check_color(player, bg_color) >= 2:
+                        correct += 1
                     accuracy = calculate_accuracy(correct, total)
                 
                 elif event.key == pygame.K_e:
@@ -185,7 +205,7 @@ def test_ai(genome, config):
                         player.color = transform_output(output)
 
                         # Updating accuracy
-                        if check_color(player, bg_color):
+                        if check_color(player, bg_color) >= 2:
                             correct += 1  
                         accuracy = calculate_accuracy(correct, total)
 
@@ -204,24 +224,39 @@ def calculate_accuracy(correct, total):
     else:
         return 0
 
-def check_color(player, bg_color):
-    if player.color == bg_color:
-        return True
-    return False
+def calculate_MSE(value, correct_value, n = 3):
+    mse = (1/n) * (((value[0] - correct_value[0]) ** 2) + ((value[1] - correct_value[1]) ** 2) + ((value[2] - correct_value[2]) ** 2))
+    return mse
 
-def get_inputs(bg_color): # HAHAHA what a useless function!
-    return bg_color
+def check_color(player, bg_color):
+    """ Returns 0 if not close at all, 1 if somewhat close, 2 if pretty close, and 3 if exact"""
+    
+    if (round(player.color[0]), round(player.color[1]), round(player.color[2])) == bg_color:
+        return 3
+    
+    elif (round(player.color[0], -1), round(player.color[1], -1), round(player.color[2], -1)) == (round(bg_color[0], -1), round(bg_color[1], -1), round(bg_color[2], -1)):
+        return 2
+
+    elif (round(player.color[0], -2), round(player.color[1], -2), round(player.color[2], -2)) == (round(bg_color[0], -2), round(bg_color[1], -2), round(bg_color[2], -2)):
+        return 1
+
+    return 0
+
+def get_inputs(bg_color):
+    transformed_bg_color = tuple(elem / 255 for elem in bg_color)
+    return transformed_bg_color
 
 def transform_output(output):
-    transformed_output = tuple(round(elem * 255) for elem in output)
+    transformed_output = tuple(elem * 255 for elem in output)
     return transformed_output
 
 def get_random_color():
-    return choice(BG_COLORS)#tuple(randint(0, 255) for i in range(0, 3))#
+    return tuple(randint(0, 255) for i in range(0, 3))#choice(BG_COLORS)
 
 if __name__ == '__main__':
     # Pygame Setup
     pygame.init()
+    pygame.mixer.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption(SCREEN_CAPTION)
     font = pygame.font.SysFont("Arial", 30)
@@ -244,6 +279,7 @@ if __name__ == '__main__':
         p.add_reporter(neat.StdOutReporter(True))
         stats = neat.StatisticsReporter()
         p.add_reporter(stats)
+        p.add_reporter(neat.Checkpointer(50))
 
         # Run NEAT
         generation = 0
@@ -253,8 +289,16 @@ if __name__ == '__main__':
         # Save the winner
         with open(best_genome_path, 'wb') as f:
             pickle.dump(winner, f)
+        
+        # Display the results
+        success = pygame.mixer.Sound(f"{os.getcwd()}/success.wav")
+        success.set_volume(0.9)
+        success.play(6)
     
     else:
+        # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
+        # p.run(eval_genomes, 10)
+
         with open(best_genome_path, 'rb') as f:
             genome = pickle.load(f)
         test_ai(genome, config)

@@ -1,6 +1,6 @@
 [NEAT]
 fitness_criterion     = max
-fitness_threshold     = 5000
+fitness_threshold     = 98
 pop_size              = 500
 reset_on_extinction   = True
 
@@ -34,7 +34,7 @@ conn_delete_prob        = 0.5
 
 # connection enable options
 enabled_default         = True
-enabled_mutate_rate     = 0.01
+enabled_mutate_rate     = 0.02
 
 feed_forward            = True
 initial_connection      = full_nodirect
@@ -72,7 +72,7 @@ compatibility_threshold = 3.0
 [DefaultStagnation]
 species_fitness_func = max
 max_stagnation       = 10
-species_elitism      = 25
+species_elitism      = 8
 
 [DefaultReproduction]
 elitism            = 0

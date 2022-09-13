@@ -5,7 +5,7 @@ SCREEN_CAPTION = "I dont know what to name this program"
 FPS = 120
 
 CONFIG_PATH = f"{os.getcwd()}/config.txt"
-MAX_GENERATIONS = 30
+MAX_GENERATIONS = 100000000
 GENERATION_TIME = 7000 # In milliseconds
 
 PLAYER_WIDTH = 30
@@ -24,4 +24,4 @@ COLOR_DURATION = 500
 BG_COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 255), (255, 255, 0), (0, 255, 255)]
 
 FAST_AI_TRAINING = True
-FAST_COLOR_CHANGES_NUM = 500
+FAST_COLOR_CHANGES_NUM = 250
