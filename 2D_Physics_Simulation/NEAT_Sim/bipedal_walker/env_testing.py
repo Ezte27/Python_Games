@@ -13,7 +13,6 @@ import gym
 
 runs_per_net = 2
 
-
 # Use the NN network phenotype and the discrete actuator force function.
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -21,16 +20,17 @@ def eval_genome(genome, config):
     fitnesses = []
 
     for runs in range(runs_per_net):
-        env = gym.make("CartPole-v1")
+        env = gym.make("BipedalWalker-v3")
 
         observation, info = env.reset()
 
         # Run the given simulation for up to num_steps time steps.
         fitness = 0.0
         done = False
-        while not done:
+        truncated = False
+        while all([(not done), (not truncated)]):
     
-            action = np.argmax(net.activate(observation))
+            action = net.activate(observation)
 
             observation, reward, done, truncated, info = env.step(action)
 
@@ -45,7 +45,6 @@ def eval_genome(genome, config):
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
         genome.fitness = eval_genome(genome, config)
-
 
 def run():
     # Load the config file, which is assumed to live in
