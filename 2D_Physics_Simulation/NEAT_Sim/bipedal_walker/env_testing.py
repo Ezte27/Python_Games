@@ -7,7 +7,6 @@ import os
 import pickle
 
 import neat
-from visualize import plot_stats
 import numpy as np
 
 import gym
@@ -70,8 +69,6 @@ def run():
         pickle.dump(winner, f)
 
     print(winner)
-
-    plot_stats(stats, ylog=True, view=True, filename=os.path.join(local_dir, "feedforward-fitness.svg"))
 
 if __name__ == '__main__':
     run()
