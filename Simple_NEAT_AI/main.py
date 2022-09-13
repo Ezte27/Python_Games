@@ -296,8 +296,13 @@ if __name__ == '__main__':
         success.play(6)
     
     else:
-        # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
-        # p.run(eval_genomes, 10)
+        # generation = 1349
+        # p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-1349')
+        # winner = p.run(eval_genomes, 2)
+
+        # # Save the winner
+        # with open(best_genome_path, 'wb') as f:
+        #     pickle.dump(winner, f)
 
         with open(best_genome_path, 'rb') as f:
             genome = pickle.load(f)

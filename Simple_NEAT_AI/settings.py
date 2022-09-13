@@ -5,7 +5,7 @@ SCREEN_CAPTION = "I dont know what to name this program"
 FPS = 120
 
 CONFIG_PATH = f"{os.getcwd()}/config.txt"
-MAX_GENERATIONS = 100000000
+MAX_GENERATIONS = 1500
 GENERATION_TIME = 7000 # In milliseconds
 
 PLAYER_WIDTH = 30
