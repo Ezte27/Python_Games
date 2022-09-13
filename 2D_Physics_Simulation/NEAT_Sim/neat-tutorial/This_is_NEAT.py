@@ -81,6 +81,5 @@ def run():
     visualize.draw_net(config, winner, view=True, node_names=node_names,
                        filename=os.path.join(local_dir, "winner-feedforward.gv"))
 
-
 if __name__ == '__main__':
     run()
