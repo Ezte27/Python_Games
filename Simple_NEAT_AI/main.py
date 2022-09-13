@@ -1,5 +1,5 @@
 """
-    Simple program to understand NEAT-python. In this program the ai will have ONE goal and it is to match the background color. THAT SIMPLE. The AI will have 3 input neurons with the rgb values of the background and it will have 3 output neurons which will return the rgb values for the color of the AI
+    Simple program to understand NEAT-python. In this program the ai will have ONE goal and it is to match the color of the background. THAT SIMPLE. The AI will have 3 input neurons with the rgb values of the background and it will have 3 output neurons which will return the rgb values for the color of the AI
 """
 
 import math
