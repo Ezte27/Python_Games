@@ -67,7 +67,7 @@ total_reward = 0
 reward_per_step = []
 while True:
     try:
-        action = net.activate(observation)
+        action = np.argmax(net.activate(observation))
     except NameError:
         action = env.action_space.sample()
 
