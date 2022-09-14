@@ -1,5 +1,6 @@
 import os
 import pickle
+from random import randint
 import neat
 import gym
 import numpy as np
@@ -10,7 +11,7 @@ with open(os.path.join(local_dir, 'winner.pickle'), 'rb') as f:
     genome = pickle.load(f)
 
 print('Loaded genome: ')
-print(genome)
+print(f"Fitness: {genome.fitness}")
 
 
 config_path = os.path.join(local_dir, 'config.txt')
@@ -26,8 +27,8 @@ observation, info = env.reset()
 terminated = False
 truncated = False
 while (not terminated) and (not truncated):
-    action = np.argmax(net.activate(observation))
+    action = net.activate(observation)
 
     observation, reward, terminated, truncated, info = env.step(action)
-    env.render()
+
 env.close()
