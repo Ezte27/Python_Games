@@ -57,8 +57,8 @@ def run():
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_path)
 
-    #pop = neat.Population(config)
-    pop = neat.Checkpointer.restore_checkpoint('neat-checkpoint-65')
+    pop = neat.Population(config)
+    #pop = neat.Checkpointer.restore_checkpoint('neat-checkpoint-65')
     
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
