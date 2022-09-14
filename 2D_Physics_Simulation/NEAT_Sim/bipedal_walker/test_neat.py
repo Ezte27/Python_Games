@@ -26,9 +26,20 @@ observation, info = env.reset()
 
 terminated = False
 truncated = False
-while (not terminated) and (not truncated):
+
+steps = 0
+total_reward = 0
+while True:
     action = net.activate(observation)
 
     observation, reward, terminated, truncated, info = env.step(action)
+    
+    steps += 1
+    total_reward += reward
+
+    if terminated or truncated or steps >= 400:
+        break
+
+print(f"step: {steps}, total_reward: {total_reward}")
 
 env.close()

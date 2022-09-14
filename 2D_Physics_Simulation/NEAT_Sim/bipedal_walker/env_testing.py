@@ -58,7 +58,7 @@ def run():
                          config_path)
 
     pop = neat.Population(config)
-    #pop = neat.Checkpointer.restore_checkpoint('neat-checkpoint-65')
+    #pop = neat.Checkpointer.restore_checkpoint(os.path.join(local_dir, 'neat-checkpoint-797'))
     
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
