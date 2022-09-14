@@ -5,13 +5,13 @@
 # Note: Pop size and max stagnation should be inversely related
 [NEAT]
 fitness_criterion     = max
-fitness_threshold     = 150
-pop_size              = 50
+fitness_threshold     = 100
+pop_size              = 100
 reset_on_extinction   = 1
 
 [DefaultGenome]
 num_inputs              = 24
-num_hidden              = 2
+num_hidden              = 3
 num_outputs             = 4
 
 initial_connection      = partial_direct 0.5
@@ -66,9 +66,8 @@ compatibility_threshold = 3.0
 
 [DefaultStagnation]
 species_fitness_func = max
-max_stagnation  = 26
-species_elitism = 1
+max_stagnation  = 20
 
 [DefaultReproduction]
-elitism            = 0
+elitism            = 1
 survival_threshold = 0.2

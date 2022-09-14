@@ -7,7 +7,7 @@ import numpy as np
 
 local_dir = os.path.dirname(__file__)
 
-with open(os.path.join(local_dir, 'winner.pickle'), 'rb') as f:
+with open(os.path.join(local_dir, 'stats/winner.pickle'), 'rb') as f:
     genome = pickle.load(f)
 
 print('Loaded genome: ')

@@ -13,6 +13,7 @@ from visualize import plot_stats, plot_species
 
 import gym
 
+
 runs_per_net = 2
 
 # Use the NN network phenotype and the discrete actuator force function.
@@ -66,10 +67,10 @@ def run():
     pop.add_reporter(neat.Checkpointer(15))
 
     pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
-    winner = pop.run(pe.evaluate, 1800)
+    winner = pop.run(pe.evaluate, 1000)
 
     # Save the winner.
-    with open(os.path.join(local_dir, 'winner.pickle'), 'wb') as f:
+    with open(os.path.join(local_dir, 'stats/winner.pickle'), 'wb') as f:
         pickle.dump(winner, f)
 
     print(winner)
