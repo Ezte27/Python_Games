@@ -65,8 +65,8 @@ def run():
     pop.add_reporter(neat.StdOutReporter(True))
     pop.add_reporter(neat.Checkpointer(15))
 
-    # pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
-    winner = pop.run(eval_genomes, 1800)#pe.evaluate)
+    pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
+    winner = pop.run(pe.evaluate, 1800)
 
     # Save the winner.
     with open(os.path.join(local_dir, 'winner.pickle'), 'wb') as f:
