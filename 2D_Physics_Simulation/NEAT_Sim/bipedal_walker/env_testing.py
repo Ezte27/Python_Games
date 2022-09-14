@@ -57,14 +57,16 @@ def run():
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_path)
 
-    pop = neat.Population(config)
+    #pop = neat.Population(config)
+    pop = neat.Checkpointer.restore_checkpoint('neat-checkpoint-65')
+    
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
     pop.add_reporter(neat.StdOutReporter(True))
-    pop.add_reporter(neat.Checkpointer(50))
+    pop.add_reporter(neat.Checkpointer(15))
 
     # pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
-    winner = pop.run(eval_genomes, 2500)#pe.evaluate)
+    winner = pop.run(eval_genomes, 1800)#pe.evaluate)
 
     # Save the winner.
     with open(os.path.join(local_dir, 'winner.pickle'), 'wb') as f:
