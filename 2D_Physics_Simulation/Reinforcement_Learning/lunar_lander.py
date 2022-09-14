@@ -70,7 +70,7 @@ truncated = False
 for _ in range(1000):
     clock.tick(FPS)
 
-    action = heuristic(env, observation)
+    action = env.action_space.sample()#heuristic(env, observation)
 
     observation, reward, terminated, truncated, info = env.step(action)
 
