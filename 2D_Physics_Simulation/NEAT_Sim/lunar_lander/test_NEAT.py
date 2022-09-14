@@ -30,9 +30,6 @@ if 'genome' in locals():
 
     net = neat.nn.FeedForwardNetwork.create(genome, config)
 
-env = gym.make("LunarLander-v2", render_mode="human")
-observation, info = env.reset()
-
 def display_stats(steps:int, fitness_per_step: list, view:bool = True, ylog:bool = False, filename:str ='stats/fitness.svg'):
     if plt is None:
         warnings.warn("This display is unavailable due to missing dependency (matplotlib)")
@@ -59,13 +56,19 @@ def display_stats(steps:int, fitness_per_step: list, view:bool = True, ylog:bool
 
     plt.close()
 
+env = gym.make("LunarLander-v2", render_mode="human")
+observation, info = env.reset()
+
 terminated = False
 truncated = False
+
+runs = 0
+MAX_RUNS = 6
 
 steps = 0
 total_reward = 0
 reward_per_step = []
-while True:
+while runs < MAX_RUNS:
     try:
         action = np.argmax(net.activate(observation))
     except NameError:
@@ -77,8 +80,9 @@ while True:
     total_reward += reward
     reward_per_step.append(reward)
 
-    if terminated or truncated or steps >= 400:
-        break
+    if terminated or truncated:
+        runs += 1
+        observation, info = env.reset()
 
 print(f"step: {steps}, total_reward: {total_reward}")
 display_stats(steps, reward_per_step, filename = os.path.join(local_dir, 'stats/fitness.svg'))
