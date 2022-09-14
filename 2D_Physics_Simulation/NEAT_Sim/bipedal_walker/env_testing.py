@@ -9,6 +9,8 @@ import pickle
 import neat
 import numpy as np
 
+from visualize import plot_stats, plot_species
+
 import gym
 
 runs_per_net = 2
@@ -59,16 +61,20 @@ def run():
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
     pop.add_reporter(neat.StdOutReporter(True))
-    pop.add_reporter(neat.Checkpointer(25))
+    pop.add_reporter(neat.Checkpointer(50))
 
     # pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
-    winner = pop.run(eval_genomes)#pe.evaluate)
+    winner = pop.run(eval_genomes, 2)#pe.evaluate)
 
     # Save the winner.
     with open(os.path.join(local_dir, 'winner.pickle'), 'wb') as f:
         pickle.dump(winner, f)
 
     print(winner)
+
+    # Display the results
+    plot_stats(stats, ylog=True, view=True, filename=os.path.join(local_dir, "stats/feedforward-fitness.svg"))
+    plot_species(stats, view=True, filename=os.path.join(local_dir, "stats/feedforward-speciation.svg"))
 
 if __name__ == '__main__':
     run()

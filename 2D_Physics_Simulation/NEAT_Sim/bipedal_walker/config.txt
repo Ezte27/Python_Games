@@ -2,10 +2,11 @@
 
 # The `NEAT` section specifies parameters particular to the NEAT algorithm
 # or the experiment itself.  This is the only required section.
+# Note: Pop size and max stagnation should be inversely related
 [NEAT]
 fitness_criterion     = max
-fitness_threshold     = 5
-pop_size              = 50
+fitness_threshold     = 50
+pop_size              = 5
 reset_on_extinction   = 1
 
 [DefaultGenome]
@@ -65,7 +66,7 @@ compatibility_threshold = 3.0
 
 [DefaultStagnation]
 species_fitness_func = max
-max_stagnation  = 20
+max_stagnation  = 40
 species_elitism = 1
 
 [DefaultReproduction]
