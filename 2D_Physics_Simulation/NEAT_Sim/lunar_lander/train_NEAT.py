@@ -77,8 +77,8 @@ def run():
     print(winner)
 
     # Display the results
-    plot_stats(stats, ylog=False, view=True, filename=os.path.join(local_dir, "stats/feedforward-fitness.svg"))
-    plot_species(stats, view=True, filename=os.path.join(local_dir, "stats/feedforward-speciation.svg"))
+    plot_stats(stats, ylog=False, view=True, filename=os.path.join(local_dir, "stats/feedforward-fitness.png"))
+    plot_species(stats, view=True, filename=os.path.join(local_dir, "stats/feedforward-speciation.png"))
 
 if __name__ == '__main__':
     run()

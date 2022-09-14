@@ -85,6 +85,6 @@ while runs < MAX_RUNS:
         observation, info = env.reset()
 
 print(f"step: {steps}, total_reward: {total_reward}")
-display_stats(steps, reward_per_step, filename = os.path.join(local_dir, 'stats/fitness.svg'))
+display_stats(steps, reward_per_step, filename = os.path.join(local_dir, 'stats/fitness.png'))
 
 env.close()

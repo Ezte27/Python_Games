@@ -2,7 +2,7 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.svg'):
+def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.png'):
     """ Plots the population's average and best fitness. """
     if plt is None:
         warnings.warn("This display is not available due to a missing optional dependency (matplotlib)")
@@ -32,7 +32,7 @@ def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.svg'):
 
     plt.close()
 
-def plot_species(statistics, view=False, filename='speciation.svg'):
+def plot_species(statistics, view=False, filename='speciation.png'):
     """ Visualizes speciation throughout evolution. """
     if plt is None:
         warnings.warn("This display is not available due to a missing optional dependency (matplotlib)")
