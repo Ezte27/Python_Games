@@ -61,7 +61,7 @@ def run():
                          config_path)
 
     pop = neat.Population(config)
-    #pop = neat.Checkpointer.restore_checkpoint(os.path.join(local_dir, 'neat-checkpoint-460'))
+    #pop = neat.Checkpointer.restore_checkpoint(os.path.join(local_dir, 'neat-checkpoint-82'))
     
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
@@ -69,7 +69,7 @@ def run():
     pop.add_reporter(neat.Checkpointer(25))
 
     pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
-    winner = pop.run(pe.evaluate, 450)
+    winner = pop.run(pe.evaluate, 100)
 
     # Save the winner.
     with open(os.path.join(local_dir, 'stats/winner.pickle'), 'wb') as f:
