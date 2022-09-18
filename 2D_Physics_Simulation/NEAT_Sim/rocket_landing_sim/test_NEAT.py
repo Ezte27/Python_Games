@@ -69,7 +69,7 @@ def render_font(font, text, display):
     pygame.display.update()
 
 env = gym.make("RocketLander-v0", render_mode="human")
-observation, info = env.reset(seed=2)
+observation, info = env.reset()
 
 display_surface = pygame.display.get_surface()
 font = pygame.font.SysFont('ariel', 20)
@@ -77,23 +77,51 @@ font = pygame.font.SysFont('ariel', 20)
 terminated = False
 truncated = False
 
-runs = 0
-MAX_RUNS = 2
+MANUAL_CONTROL = True
 
-steps = 0
-total_reward = 0
-reward_per_step = []
+runs = 0
+MAX_RUNS = 4
+
+steps                 = 0
+total_steps           = 0
+total_reward          = 0
+reward_per_step       = []
 total_reward_per_step = []
 while runs < MAX_RUNS:
     steps += 1
+    total_steps += 1
+    if MANUAL_CONTROL:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_w]:
+            action = 2
 
-    try:
-        action = np.argmax(net.activate(observation))
+        elif keys[pygame.K_s]:
+            action = 3
+        
+        elif keys[pygame.K_a]:
+            action = 4
 
-    except NameError:
-        action = env.action_space.sample()
+        elif keys[pygame.K_d]:
+            action = 5
+        
+        elif keys[pygame.K_LEFT]:
+            action = 0
+        
+        elif keys[pygame.K_RIGHT]:
+            action = 1
+        
+        else:
+            action = 6
+    
+    else:
+        try:
+            action = np.argmax(net.activate(observation))
 
-    #action = 6 if action == 2 and steps < 200 else action
+        except NameError:
+            action = env.action_space.sample()
+            print('OHO')
+
+    #action = 6 if action == 2 and steps < 190 else action
 
     # if 250 < steps < 300:
     #     time.sleep(1)
@@ -110,10 +138,11 @@ while runs < MAX_RUNS:
 
     if terminated or truncated:
         runs += 1
-        observation, info = env.reset(seed=2)
+        steps = 0
+        observation, info = env.reset()
 
-print(f"step: {steps}, total_reward: {total_reward}")
-display_stats(steps, reward_per_step, filename = os.path.join(local_dir, 'stats/fitness1.png'))
-display_stats(steps, total_reward_per_step, filename = os.path.join(local_dir, 'stats/fitness2.png'))
+print(f"total_steps: {total_steps}, total_reward: {total_reward}")
+display_stats(total_steps, reward_per_step, filename = os.path.join(local_dir, 'stats/fitness1.png'))
+display_stats(total_steps, total_reward_per_step, filename = os.path.join(local_dir, 'stats/fitness2.png'))
 
 env.close()

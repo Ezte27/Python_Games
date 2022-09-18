@@ -3,7 +3,7 @@
 [NEAT]
 pop_size              = 250
 fitness_criterion     = max
-fitness_threshold     = 1.9
+fitness_threshold     = 2.4
 reset_on_extinction   = 0
 
 [DefaultGenome]
@@ -23,8 +23,8 @@ conn_delete_prob        = 0.1
 node_add_prob           = 0.15
 node_delete_prob        = 0.1
 
-activation_default      = clamped
-activation_options      = clamped
+activation_default      = tanh
+activation_options      = tanh
 activation_mutate_rate  = 0.0
 
 aggregation_default     = sum
