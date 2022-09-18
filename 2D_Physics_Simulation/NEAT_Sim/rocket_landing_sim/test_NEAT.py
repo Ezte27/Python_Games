@@ -68,7 +68,7 @@ terminated = False
 truncated = False
 
 runs = 0
-MAX_RUNS = 2
+MAX_RUNS = 10
 
 steps = 0
 total_reward = 0
@@ -88,6 +88,7 @@ while runs < MAX_RUNS:
     steps += 1
     total_reward += reward
     reward_per_step.append(reward)
+    print(observation)
 
     if terminated or truncated:
         runs += 1
