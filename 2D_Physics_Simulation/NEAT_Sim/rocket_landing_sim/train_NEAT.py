@@ -14,7 +14,6 @@ from visualize import plot_stats, plot_species
 import gym
 import rocket_lander_gym
 
-
 runs_per_net = 2
 
 # Use the NN network phenotype and the discrete actuator force function.
@@ -69,7 +68,7 @@ def run():
     pop.add_reporter(neat.Checkpointer(25))
 
     pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
-    winner = pop.run(pe.evaluate, 100)
+    winner = pop.run(pe.evaluate, 650)
 
     # Save the winner.
     with open(os.path.join(local_dir, 'stats/winner.pickle'), 'wb') as f:
