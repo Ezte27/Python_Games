@@ -88,7 +88,7 @@ class SoilLayer:
         horizontal_tiles, vertical_tiles = ground.get_width() // TILE_SIZE, ground.get_height() // TILE_SIZE
 
         self.grid = [[[] for col in range(horizontal_tiles)] for row in range(vertical_tiles)]
-        for x, y, _ in load_pygame(os.path.join("data", "map.tmx")).get_layer_by_name("Farmable").tiles():
+        for x, y, _ in load_pygame(os.path.join("data", "map1.tmx")).get_layer_by_name("Farmable").tiles():
             self.grid[y][x].append("F")
     
     def create_hitBoxes(self):

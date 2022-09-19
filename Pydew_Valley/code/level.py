@@ -58,7 +58,7 @@ class Level:
         self.bg_music.play(loops = -1)
 
     def setup(self):
-        tmx_data = load_pygame(f"{self.cwd}/data/map.tmx")
+        tmx_data = load_pygame(f"{self.cwd}/data/map1.tmx")
 
         # House
         for layer in ['HouseFloor', 'HouseFurnitureBottom']:
