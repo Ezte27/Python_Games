@@ -1,14 +1,14 @@
 # neat-python configuration for the RocketLander-v0 environment on OpenAI Gym
 
 [NEAT]
-pop_size              = 700
+pop_size              = 600
 fitness_criterion     = max
-fitness_threshold     = 2.4
+fitness_threshold     = 2.2
 reset_on_extinction   = 0
 
 [DefaultGenome]
 num_inputs              = 10
-num_hidden              = 2
+num_hidden              = 1
 num_outputs             = 7
 
 initial_connection      = partial_nodirect 0.5
