@@ -13,6 +13,8 @@ local_dir = os.path.dirname(__file__)
 genome_path = 'stats/winner.pickle'
 full_path = os.path.join(local_dir, genome_path)
 
+MANUAL_CONTROL = True if input('MANUAL_CONTROL = ') == 'True' or '1' else False
+
 try:
     with open(full_path, 'rb') as f:
         genome = pickle.load(f)
@@ -76,8 +78,6 @@ font = pygame.font.SysFont('ariel', 20)
 
 terminated = False
 truncated = False
-
-MANUAL_CONTROL = True
 
 runs = 0
 MAX_RUNS = 4
