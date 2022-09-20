@@ -1,4 +1,3 @@
-from ssl import OP_NO_RENEGOTIATION
 import pygame
 import pymunk
 import pymunk.pygame_util
