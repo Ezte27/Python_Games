@@ -37,42 +37,34 @@ def create_boundaries(space, width, height):
         shape.color = (20, 20, 20, 97)
         space.add(body, shape)
 
-def create_structures(space, width, height):
-    BROWN = (139, 69, 19, 100)
+def create_pendulums(space, width, height):
+    rad = 25
+
     rects = [
-        [(width - 400, height - 120), (40, 200), BROWN, 100],
-        [(width - 100, height - 120), (40, 200), BROWN, 100],
-        [(width - 250, height - 240), (340, 40), BROWN, 150],
+        [(width//2 - rad*4, 25), rad, 100],
+        [(width//2 - rad*2, 25), rad, 100],
+        [(width//2, 25), rad, 100],
+        [(width//2 + rad*2, 25), rad, 100],
+        [(width//2 + rad*4, 25), rad, 100]
     ]
 
-    for pos, size, color, mass in rects:
-        body = pymunk.Body(body_type = pymunk.Body.DYNAMIC)
-        body.position = pos
-        shape = pymunk.Poly.create_box(body, size, radius= 2)
-        shape.elasticity = 0.4
-        shape.friction = 0.4
-        shape.mass = mass
-        shape.color = color
-        space.add(body, shape)
+    for pos, radius, mass in rects:
+        rotation_center_body = pymunk.Body(body_type = pymunk.Body.STATIC)
+        rotation_center_body.position = pos
 
-def create_pendulum(space, width, height):
-    rotation_center_body = pymunk.Body(body_type = pymunk.Body.STATIC)
-    rotation_center_body.position = (300, 100)
+        body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
+        body.position = (pos[0], pos[1] + 200)
 
-    body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
-    body.position = (300, 300)
+        circle = pymunk.Circle(body, radius)
+        
+        rotation_center_joint = pymunk.PinJoint(body, rotation_center_body, (0, 0), (0, 0))
 
-    line = pymunk.Segment(body, (0, 0), (200, 0), 5)
-    circle = pymunk.Circle(body, 40, (200, 0))
-    rotation_center_joint = pymunk.PinJoint(body, rotation_center_body, (0, 0), (0, 0))
+        circle.friction = 0.01
+        circle.mass = mass
+        circle.elasticity = 1
 
-    line.friction = 1
-    circle.friction = 1
-    line.mass = 8
-    circle.mass = 30
-    circle.elasticity = 0.95
+        space.add(body, circle, rotation_center_joint)
 
-    space.add(body, circle, line, rotation_center_joint)
 
 def create_circle(space, radius, mass, pos):
     body = pymunk.Body(body_type = pymunk.Body.STATIC)
@@ -88,15 +80,14 @@ def create_circle(space, radius, mass, pos):
 def run(window, width, height):
     run = True
     clock = pygame.time.Clock()
-    fps = 60
-    dt = 1/fps
+    FPS = 60
+    dt = 1/FPS
 
     space = pymunk.Space()
     space.gravity = (0, 981)
 
     create_boundaries(space, width, height)
-    create_structures(space, width, height)
-    create_pendulum(space, width, height)
+    create_pendulums(space, width, height)
 
     draw_options = pymunk.pygame_util.DrawOptions(window)
 
@@ -110,12 +101,13 @@ def run(window, width, height):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
                 run = False
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if not ball:
                     pressed_pos = pygame.mouse.get_pos()
-                    ball = create_circle(space, 30, 10, pressed_pos)
+                    ball = create_circle(space, 15, 10, pressed_pos)
+
                 elif pressed_pos:
                     ball.body.body_type = pymunk.Body.DYNAMIC
                     angle = calculate_angle(*line) # * asterisk breaks the list in the different elements
@@ -124,6 +116,7 @@ def run(window, width, height):
                     fy = math.sin(angle) * force
                     ball.body.apply_impulse_at_local_point((fx, fy), (0, 0))
                     pressed_pos = None
+
                 else:
                     space.remove(ball, ball.body)
                     ball = None
@@ -132,7 +125,7 @@ def run(window, width, height):
         draw(space, window, draw_options, line)
 
         space.step(dt)
-        clock.tick(fps)
+        clock.tick(FPS)
 
-if __name__ == '__main__':
-    run(window, WIDTH, HEIGHT)
+run(window, WIDTH, HEIGHT)
+pygame.quit()
