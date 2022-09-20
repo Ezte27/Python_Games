@@ -4,6 +4,7 @@ from settings import *
 from support import import_folder
 from sprites import Generic
 from timer import Timer
+import os
 
 class Rain:
     def __init__(self, all_sprites) -> None:
@@ -12,7 +13,7 @@ class Rain:
         self.all_sprites = all_sprites
         self.rain_drops = import_folder("graphics/rain/drops/")
         self.rain_floor = import_folder("graphics/rain/floor/")
-        self.floor_w, self.floor_h = pygame.image.load("graphics/world/ground.png").get_size()
+        self.floor_w, self.floor_h = pygame.image.load(os.getcwd() + GROUND1).get_size()
         
         # Fog
         self.fog_color = randint(140,180)

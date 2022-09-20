@@ -58,7 +58,12 @@ class Level:
         self.bg_music.play(loops = -1)
 
     def setup(self):
-        tmx_data = load_pygame(f"{self.cwd}/data/map1.tmx")
+        tmx_data = load_pygame(f"{self.cwd}{MAP2}")
+
+        # Ground
+        for layer in ['Ground', 'Hills']:
+            for x, y, surf in tmx_data.get_layer_by_name(layer).tiles():
+                Generic((x * TILE_SIZE, y * TILE_SIZE), surf, self.all_sprites, LAYERS['ground'])
 
         # House
         for layer in ['HouseFloor', 'HouseFurnitureBottom']:
@@ -83,7 +88,7 @@ class Level:
             Generic((x * TILE_SIZE, y * TILE_SIZE), surf, [self.all_sprites, self.collision_sprites], LAYERS['main'])
 
         # Water
-        water_frames = import_folder(f"{self.cwd}/graphics/water")
+        water_frames = import_folder(f"{self.cwd}{WATER}")
         for x, y, surf in tmx_data.get_layer_by_name('Water').tiles():
             Water((x * TILE_SIZE, y * TILE_SIZE), water_frames, self.all_sprites)
 
@@ -96,7 +101,7 @@ class Level:
             Tree((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites, self.tree_sprites], obj.name, player_add = self.player_add_item)
 
         # Ground
-        Generic((0, 0), pygame.image.load(os.getcwd() + '/graphics/world/ground.png').convert_alpha(), self.all_sprites, z=LAYERS['ground'])
+        #Generic((0, 0), pygame.image.load(os.getcwd() + GROUND2).convert_alpha(), self.all_sprites, z=LAYERS['ground'])
         
         # Collision Tiles
         for x, y, surf in tmx_data.get_layer_by_name('Collision').tiles():

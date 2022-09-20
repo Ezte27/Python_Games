@@ -84,11 +84,11 @@ class SoilLayer:
         self.planting_sound.set_volume(PLANTING_SOUND_VOLUME)
 
     def create_soil_grid(self):
-        ground = pygame.image.load(os.path.join("graphics/world", "ground.png"))
+        ground = pygame.image.load(os.getcwd() + GROUND1)
         horizontal_tiles, vertical_tiles = ground.get_width() // TILE_SIZE, ground.get_height() // TILE_SIZE
 
         self.grid = [[[] for col in range(horizontal_tiles)] for row in range(vertical_tiles)]
-        for x, y, _ in load_pygame(os.path.join("data", "map1.tmx")).get_layer_by_name("Farmable").tiles():
+        for x, y, _ in load_pygame(os.getcwd() + MAP1).get_layer_by_name("Farmable").tiles():
             self.grid[y][x].append("F")
     
     def create_hitBoxes(self):

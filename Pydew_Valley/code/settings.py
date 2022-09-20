@@ -15,6 +15,15 @@ TILE_SIZE = 64
 PLAYER_SPEED = 200
 ANIMATE_PLAYER_SPEED = 4
 
+# Paths
+MAP1    = "/data/map1.tmx"
+MAP2    = "/data/map2.tmx"
+
+GROUND1 = '/graphics/world/ground1.png'
+GROUND2 = '/graphics/world/ground2.png'
+
+WATER   = "/graphics/water"
+
 # Overlay positions
 
 OVERLAY_POSITIONS = {
