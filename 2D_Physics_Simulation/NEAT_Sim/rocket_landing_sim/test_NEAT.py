@@ -183,7 +183,7 @@ while runs < MAX_RUNS:
         except:
             print('Unknown ERROR')
     
-    print(action)
+    #print(action)
     #action = heuristic(env, observation)
     #print(observation[1])
     #print(action)
@@ -205,7 +205,6 @@ while runs < MAX_RUNS:
 
     if terminated or truncated:
         print(steps)
-        break
         runs += 1
         steps = 0
         observation, info = env.reset()

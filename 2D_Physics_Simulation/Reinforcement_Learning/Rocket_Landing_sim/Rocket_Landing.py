@@ -24,11 +24,11 @@ while runs < 1:
 
     observation, reward, terminated, truncated, info = env.step(action)
 
-    print(reward)
+    #print(reward)
 
     steps += 1
 
-    if steps > 30:
+    if steps > 3000:
         terminated = True
 
     if terminated or truncated:
