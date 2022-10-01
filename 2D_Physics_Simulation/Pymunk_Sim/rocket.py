@@ -15,11 +15,11 @@ VIEWPORT_HEIGHT        = 1012
 WINDOW                 = pygame.display.set_mode((VIEWPORT_WIDTH, VIEWPORT_HEIGHT))
 CLOCK                  = pygame.time.Clock()
 
-FPS                    = 120
-SCALE                  = 1  # Temporal Scaling, lower is faster - adjust forces appropriately
+FPS                    = 60
+SCALE                  = 1 # Temporal Scaling, lower is faster - adjust forces appropriately
 
 # Pymunk Space Setup
-X_GRAVITY, Y_GRAVITY   = (0, 956 )#* SCALE)
+X_GRAVITY, Y_GRAVITY   = (0, 956 * SCALE)
 STARTING_POS           = (VIEWPORT_WIDTH//2, -200)
 
 # Sky
@@ -28,13 +28,13 @@ SKY_COLOR              = (126, 150, 233)
 # ROCKET
 MIN_THROTTLE           = 0.3
 GIMBAL_THRESHOLD       = 0.4
-MAIN_ENGINE_POWER      = 20000 * SCALE
-SIDE_ENGINE_POWER      = 2000 * SCALE
+MAIN_ENGINE_POWER      = 25000 * SCALE
+SIDE_ENGINE_POWER      = 25000 * SCALE
 
 ROCKET_WIDTH           = 40 * SCALE
 ROCKET_HEIGHT          = ROCKET_WIDTH * 5
-ROCKET_SIZE = (ROCKET_WIDTH, ROCKET_HEIGHT)
-ROCKET_MASS = 30 * SCALE
+ROCKET_SIZE            = (ROCKET_WIDTH, ROCKET_HEIGHT)
+ROCKET_MASS            = 30 * SCALE
 
 # ENGINE_HEIGHT          = ROCKET_WIDTH * 0.5
 # ENGINE_WIDTH           = ENGINE_HEIGHT * 0.7
@@ -44,7 +44,8 @@ FIRE_HEIGHT            = FIRE_WIDTH * 3.4
 
 COLD_GAS_WIDTH         = FIRE_WIDTH/1.4
 COLD_GAS_HEIGHT        = COLD_GAS_WIDTH * 3
-THRUSTER_HEIGHT        = (ROCKET_HEIGHT/2) * 0.86
+THRUSTER_HEIGHT        = (ROCKET_HEIGHT/2) * -0.86
+ENGINE_HEIGHT          = (ROCKET_HEIGHT/2) * 0.86
 
 ROCKET_ELASTICITY      = 0.1
 ROCKET_FRICTION        = 0.5
@@ -80,9 +81,13 @@ LANDING_PAD_FRICTION   = 0.7
 LANDING_PAD_COLOR      = (220, 234, 233, 97)
 
 # SMOKE FOR VISUALS
-SMOKE_LIFETIME         = 1 / FPS # Take lifetime from smoke particle
-MAX_PARTICLES          = 10
-SMOKE_RATE             = 0.90 # The rate at which the smoke gets generated [0 - 1]
+SMOKE_LIFETIME         = 0 # Lifetime
+PARTICLE_TTL_SUBTRACT  = (1 / FPS)  # Amount to subtract ttl per frame
+MAX_PARTICLES          = 100
+PARTICLE_STARTING_TTL  = 1.0
+SMOKE_RATE             = 0.98 # The rate at which the smoke gets generated. Range = [0 - PARTICLE_STARTING_TTL]
+PARTICLE_GROWTH_RATE   = 20 / FPS
+PARICLE_MAX_RADIUS     = 50 * SCALE
 
 # OTHER
 DRAW_FLAGS             = False
@@ -129,9 +134,9 @@ class Rocket:
             print("[WARNING] pygame display NOT defined")
         
         if clock:
-            self.clock = pygame.time.Clock()
+            self.clock   = pygame.time.Clock()
         else:
-            self.clock = None
+            self.clock   = None
 
         self.dt          = 1 / self.metadata['render_fps']
         self.render_mode = render_mode
@@ -140,12 +145,14 @@ class Rocket:
         
         self._setup()
 
-        self.throttle  = 0
-        self.gimbal    = 0.0
-        self.power     = 0
-        self.force_dir = 0
+        self.throttle    = 0
+        self.gimbal      = 0.0
+        self.power       = 0
+        self.force_dir   = 0
 
-        self.particles = []
+        self.engine_pos  = ()
+
+        self.particles   = []
 
         self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
     
@@ -157,7 +164,7 @@ class Rocket:
 
         self.legs         = []
         self.leg_contacts = []
-        #self._create_legs(self.lander.body)
+        self._create_legs(self.lander.body)
 
         self.landing_pad  = self._create_landing_pad()
     
@@ -250,7 +257,7 @@ class Rocket:
         self.particles.append(p)
 
     def _clean_particles(self, clean_all: bool):
-        while self.particles and (clean_all or self.particles[0][2] < 0):
+        while self.particles and (clean_all or self.particles[0][2] <= 0):
             self.particles.pop(0)
     
     def _check_leg_contacts(self, check_landing_pad):
@@ -279,10 +286,11 @@ class Rocket:
 
         self.dt          = 0
 
-        self.throttle  = 0
-        self.gimbal    = 0.0
-        self.power     = 0
-        self.force_dir = 0
+        self.throttle   = 0
+        self.gimbal     = 0.0
+        self.power      = 0
+        self.force_dir  = 0
+        self.engine_pos = ()
 
         self.draw_options = None
 
@@ -314,7 +322,7 @@ class Rocket:
         # Apply random angular vel to the rocket
         if seed:
             np.random.seed(seed)
-        self.lander.body.apply_impulse_at_local_point((np.random.randint(-100 * SCALE, 100 * SCALE, 1), 0), (0, -ROCKET_SIZE[1]/2))
+        #self.lander.body.apply_impulse_at_local_point((np.random.randint(-200 * SCALE, 200 * SCALE, 1), 0), (0, -ROCKET_SIZE[1]/2))
     
     def step(self, action):
         self.force_dir = 0
@@ -339,22 +347,29 @@ class Rocket:
         self.power = 0 if self.throttle == 0.0 else (MIN_THROTTLE + self.throttle * (1 - MIN_THROTTLE)) * (SCALE * 2)
 
         # main engine force
-        force_pos = (self.lander.body.position[0] + (np.sin(-self.lander.body.angle) * ROCKET_HEIGHT/2), self.lander.body.position[1] + (np.cos(-self.lander.body.angle) * ROCKET_HEIGHT/2))
-        force = (-np.sin(-self.lander.body.angle + self.gimbal) * MAIN_ENGINE_POWER * self.power,
-                 np.cos(-self.lander.body.angle + self.gimbal) * MAIN_ENGINE_POWER * self.power)
+        # force_pos = (self.lander.body.position[0] + (np.sin(-self.lander.body.angle) * ROCKET_HEIGHT/2), self.lander.body.position[1] + (np.cos(-self.lander.body.angle) * ROCKET_HEIGHT/2))
+        # force = (-np.sin(-self.lander.body.angle + self.gimbal) * MAIN_ENGINE_POWER * self.power,
+        #          np.cos(-self.lander.body.angle + self.gimbal) * MAIN_ENGINE_POWER * self.power)
+        # force_pos = list(ENGINE_HEIGHT * np.array(
+        #               (-np.sin(self.lander.body.angle), np.cos(self.lander.body.angle))))
+        force_pos = (0, 0)
+        force     = (0, -MAIN_ENGINE_POWER * self.power)
 
-        self.lander.body.apply_force_at_local_point(force = (force[0], -force[1]), point=force_pos)
-        self.debug = force_pos
-        self.debug2 = ((force[0] * 0.05) + force_pos[0], (-force[1] * 0.05) + force_pos[1])
-        print(self.lander.body.angle)
+        self.lander.body.apply_force_at_local_point(force = force, point = force_pos)
+
+        self.debug = (self.lander.body.position[0] + force_pos[0], self.lander.body.position[1] + force_pos[1])
         
         # control thruster force
-        force_pos_c = self.lander.body.position - THRUSTER_HEIGHT * np.array(
-                      (np.sin(self.lander.body.angle), np.cos(self.lander.body.angle)))
+        force_pos_c = list(THRUSTER_HEIGHT * np.array(
+                      (-np.sin(self.lander.body.angle), np.cos(self.lander.body.angle))))
         force_c = (-self.force_dir * np.cos(self.lander.body.angle) * SIDE_ENGINE_POWER,
                    self.force_dir * np.sin(self.lander.body.angle) * SIDE_ENGINE_POWER)
+        force_c = (SIDE_ENGINE_POWER * self.force_dir, 0)
+        #self.debug = (self.lander.body.position[0] + force_pos_c[0], self.lander.body.position[1] + force_pos_c[1])
         
-        self.lander.body.apply_force_at_local_point(force = (force_c[0], -force_c[1]), point=force_pos_c)
+        self.lander.body.apply_force_at_local_point(force = force_c, point=force_pos_c)
+
+        self.engine_pos = (self.lander.body.position[0] + (ENGINE_HEIGHT * -np.sin(self.lander.body.angle)), self.lander.body.position[1] + (ENGINE_HEIGHT * np.cos(self.lander.body.angle)))
 
         # Checking for leg contact with landing pad
         self.leg_contacts = self._check_leg_contacts(True)
@@ -369,28 +384,37 @@ class Rocket:
     def render(self):
 
         self.surf = pygame.Surface((VIEWPORT_WIDTH, VIEWPORT_HEIGHT))
+        self.particle_surf = self.surf.copy()
 
         pygame.draw.rect(self.surf, SKY_COLOR, self.surf.get_rect())
+        pygame.draw.rect(self.particle_surf, (255, 255, 255), self.particle_surf.get_rect())
 
         for obj in self.particles:
-            obj[2] -= random() * SMOKE_LIFETIME # Take time from its lifetime
-            obj[1] = (obj[1][0], obj[1][1] - (1 / randrange(1, FPS // FPS * 4))) # Move the smoke upwards
+            obj[1] = (obj[1][0], obj[1][1] - (5 / randrange(1, FPS//2))) # Move the smoke upwards
+            obj[2] -= random() * PARTICLE_TTL_SUBTRACT # Take time from its lifetime
+            obj[3] += PARTICLE_GROWTH_RATE if obj[3] < PARICLE_MAX_RADIUS else 0 # radius grows as the particle gets older
+            ttl = 1 - obj[2] #(1 / (1 + math.e ** -obj[2]))
+            
             obj[4] = (
-                int(max(0.4, 0.8 * obj[2]) * 255),
-                int(max(0.4, 0.8 * obj[2]) * 255),
-                int(max(0.4, 0.8 * obj[2]) * 255),
-                int(max(0.4, 0.8 * obj[2]) * 255)
+                int(ttl * 255),
+                int(ttl * 255),
+                int(ttl * 255),
+                int(255)
             )
 
         # Drawing the Particles
 
         for obj in self.particles:
-            pygame.draw.circle(
-                self.surf,
-                color=obj[4],
-                center = (obj[1][0], obj[1][1]),
-                radius = obj[3],
-            )
+            try:
+                pygame.draw.circle(
+                    self.particle_surf,
+                    color=obj[4],
+                    center = (obj[1][0], obj[1][1]),
+                    radius = obj[3], 
+                )
+
+            except ValueError: # particle RGB value is invalid
+                ...
 
         # Draw Two Flags on either side of the landing pad
 
@@ -442,26 +466,31 @@ class Rocket:
         if len(self.particles) <= MAX_PARTICLES:
             if self.particles:
                 if self.particles[-1][2] < SMOKE_RATE * self.throttle:
-                    self._create_particle(0.02, randrange(-10, 10) + self.lander.body.position[0], randrange(-10, 10) + self.lander.body.position[1] + ROCKET_HEIGHT / 2, 1.0, 45 * SCALE)
+                    self._create_particle(0.02, randrange(-10, 10) + self.engine_pos[0], randrange(-10, 10) + self.engine_pos[1], PARTICLE_STARTING_TTL, 8 * SCALE)
             else:
-                self._create_particle(0.02, randrange(-10, 10) + self.lander.body.position[0], randrange(-10, 10) + self.lander.body.position[1] + ROCKET_HEIGHT / 2, 1.0, 45 * SCALE)
+                if self.throttle > 0:
+                    self._create_particle(0.02, randrange(-10, 10) + self.engine_pos[0], randrange(-10, 10) + self.engine_pos[1], PARTICLE_STARTING_TTL, 8 * SCALE)
 
         self._clean_particles(False)
 
-        #self.surf = pygame.transform.flip(self.surf, False, True)
-        surf = pygame.Surface(ROCKET_SIZE)
-        surf_trans = pygame.transform.rotate(surf, math.degrees(self.lander.body.angle))
-        rect = surf_trans.get_rect(center = self.lander.body.position)
-        pygame.draw.rect(self.surf, (0, 0, 0), rect)
-        pygame.draw.circle(self.surf, (255, 255, 255), self.debug, 10)
-        pygame.draw.circle(self.surf, (255, 0, 0), self.debug2, 5)
+        self.surf = pygame.transform.flip(self.surf, False, False)
+
+        # DEBUG
+
+        #surf = pygame.Surface(ROCKET_SIZE)
+        #surf_trans = pygame.transform.rotate(surf, math.degrees(self.lander.body.angle))
+        #rect = surf_trans.get_rect(center = self.lander.body.position)
 
         if self.render_mode == "human":
             assert self.screen is not None, "Screen is NONE"
 
             self.screen.blit(self.surf, (0, 0))
 
+            self.screen.blit(self.particle_surf, (0, 0), special_flags= pygame.BLEND_RGBA_MULT)
+
             self.space.debug_draw(self.draw_options)
+
+            pygame.draw.circle(self.screen, (255, 255, 255), self.debug, 10)
 
             pygame.event.pump()
 
@@ -587,6 +616,9 @@ def run():
         elif keys[pygame.K_LCTRL] and keys[pygame.K_s]: # Screenshot
             pygame.image.save(env.screen, "rocket_landing_sim_screenshot.png")
         
+        elif keys[pygame.K_r]:
+            env.reset()
+
         else:
             action = 6
 
