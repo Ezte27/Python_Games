@@ -2,7 +2,7 @@ import pygame
 import pymunk
 import pymunk.pygame_util
 import math
-from random import randrange, random
+from random import randint, randrange, random
 import numpy as np
 from typing import Optional
 
@@ -30,9 +30,9 @@ STARTING_POS           = (VIEWPORT_WIDTH//2, -200)
 SKY_COLOR              = (212, 234, 255)
 
 MIN_THROTTLE           = 0.3
-GIMBAL_THRESHOLD       = 0.4
+GIMBAL_THRESHOLD       = 0.2
 MAIN_ENGINE_POWER      = 25000 * SCALE
-SIDE_ENGINE_POWER      = 25000 * SCALE
+SIDE_ENGINE_POWER      = 6000 * SCALE
 
 # ROCKET
 ROCKET_WIDTH           = 40 * SCALE
@@ -97,6 +97,7 @@ PARTICLE_STARTING_TTL  = 1.0
 SMOKE_RATE             = 0.98 # The rate at which the smoke gets generated. Range = [0 - PARTICLE_STARTING_TTL]
 PARTICLE_GROWTH_RATE   = 20 / FPS
 PARICLE_MAX_RADIUS     = 50 * SCALE
+PARTICLE_Y_VEL_RANGE   = [100, 300]
 
 # OTHER
 DRAW_FLAGS             = False
@@ -196,16 +197,18 @@ class Rocket:
         shape.color      = ROCKET_COLOR
 
         # Engine
-        body_engine, shape_engine      = self._create_engine(body.position)
-        # Here you should put a joint that attaches the engine to the rocket body
+        body_engine, shape_engine      = self._create_engine((body.position[0], body.position[1] + (ROCKET_SIZE[1] / 2) + ((ENGINE_SIZE[1] / 2) * 1.05)))
 
-        self.space.add(body, shape, body_engine, shape_engine)
+        # A PinJoint connecting the leg and the rocket
+        pinjoint = pymunk.PinJoint(body_engine, body, (0, (-ENGINE_SIZE[1] / 2) * 1.05), (0, ROCKET_SIZE[1] / 2))
+        pinjoint.max_force = 500000 * SCALE * 2
+
+        self.space.add(body, shape, body_engine, shape_engine, pinjoint)
 
         return shape, shape_engine
     
     def _create_engine(self, pos):
         size             = ENGINE_SIZE
-        pos              = STARTING_POS
 
         inertia          = pymunk.moment_for_box(mass = ENGINE_MASS, size = size)
 
@@ -243,19 +246,19 @@ class Rocket:
             pinjoint = pymunk.PinJoint(body, rocket, (-leg_side * LEG_SIZE[0]/2, -LEG_SIZE[1] / 2), (leg_side * ROCKET_SIZE[0]/2, LEG_HEIGHT))
 
             # A SlideJoint connecting the leg and the rocket
-            slidejoint = pymunk.SlideJoint(body, rocket, (leg_side * LEG_SIZE[0]/2, LEG_SIZE[1] / 2.6), (leg_side * ROCKET_SIZE[0]/2, LEG_SPRING_HEIGHT), 100 * SCALE, 110 * SCALE)
+            slidejoint = pymunk.SlideJoint(body, rocket, (leg_side * LEG_SIZE[0]/2, LEG_SIZE[1] / 2.6), (leg_side * ROCKET_SIZE[0]/2, LEG_SPRING_HEIGHT), 100 * SCALE, 115 * SCALE)
             slidejoint.max_force = 50000 * SCALE * 2
 
             # A SpringJoint connecting the leg and the rocket
-            springjoint = pymunk.DampedSpring(body, rocket, (leg_side * LEG_SIZE[0]/2, LEG_SIZE[1] / 2.6), (leg_side * ROCKET_SIZE[0]/2, LEG_SPRING_HEIGHT), -20000 * SCALE, -2.5, 10)
-            springjoint.max_force = 5000 * SCALE * 2
+            springjoint = pymunk.DampedSpring(body, rocket, (leg_side * LEG_SIZE[0]/2, LEG_SIZE[1] / 2.6), (leg_side * ROCKET_SIZE[0]/2, LEG_SPRING_HEIGHT), -30000 * SCALE, -2.5, 10)
+            springjoint.max_force = 8000 * SCALE * 2
 
             self.legs.append(shape)
 
             self.space.add(body, shape, pinjoint, slidejoint, springjoint)
         
         # A SpringJoint connecting both legs
-        springjoint = pymunk.DampedSpring(self.legs[0].body, self.legs[1].body, (LEG_SIZE[0]/2, LEG_SIZE[1] / 3), (-LEG_SIZE[0]/2, LEG_SIZE[1] / 3), -2000 * SCALE, -2.5, 10)
+        springjoint = pymunk.DampedSpring(self.legs[0].body, self.legs[1].body, (LEG_SIZE[0]/2, LEG_SIZE[1] / 3), (-LEG_SIZE[0]/2, LEG_SIZE[1] / 3), -1000 * SCALE, -2.5, 10)
         springjoint.max_force = 8000 * SCALE * 2
         self.space.add(springjoint)
     
@@ -349,7 +352,6 @@ class Rocket:
 
         self.isopen      = True
         self.done        = False
-        self.truncated   = False
         
         self._setup()
 
@@ -359,6 +361,8 @@ class Rocket:
         if seed:
             np.random.seed(seed)
         self.lander.body.apply_impulse_at_local_point((np.random.randint(-200 * SCALE, 200 * SCALE, 1), 0), (0, -ROCKET_SIZE[1]/2))
+
+        return ...#observation, info
     
     def step(self, action):
         assert action != None
@@ -393,21 +397,25 @@ class Rocket:
         force_pos = (0, 0)
         force     = (0, -MAIN_ENGINE_POWER * self.power)
 
-        self.lander.body.apply_force_at_local_point(force = force, point = force_pos)
+        #self.lander.body.apply_force_at_local_point(force = force, point = force_pos)
+        self.mainEngine.body.apply_force_at_local_point(force = force, point = force_pos)
 
         self.debug = (self.lander.body.position[0] + force_pos[0], self.lander.body.position[1] + force_pos[1])
+
+        # Main Engine Gimbal
+        self.mainEngine.body.angle = self.lander.body.angle + self.gimbal
         
         # control thruster force
         force_pos_c = list(THRUSTER_HEIGHT * np.array(
                       (-np.sin(self.lander.body.angle), np.cos(self.lander.body.angle))))
-        force_c = (-self.force_dir * np.cos(self.lander.body.angle) * SIDE_ENGINE_POWER,
-                   self.force_dir * np.sin(self.lander.body.angle) * SIDE_ENGINE_POWER)
+        # force_c = (-self.force_dir * np.cos(self.lander.body.angle) * SIDE_ENGINE_POWER,
+        #            self.force_dir * np.sin(self.lander.body.angle) * SIDE_ENGINE_POWER)
         force_c = (SIDE_ENGINE_POWER * self.force_dir, 0)
         #self.debug = (self.lander.body.position[0] + force_pos_c[0], self.lander.body.position[1] + force_pos_c[1])
         
         self.lander.body.apply_force_at_local_point(force = force_c, point=force_pos_c)
 
-        self.engine_pos = (self.lander.body.position[0] + (ENGINE_HEIGHT * -np.sin(self.lander.body.angle)), self.lander.body.position[1] + (ENGINE_HEIGHT * np.cos(self.lander.body.angle)))
+        self.engine_pos = (self.mainEngine.body.position[0] + (-np.sin(self.mainEngine.body.angle)), self.mainEngine.body.position[1] + (np.cos(self.mainEngine.body.angle)))
 
         # Checking for leg contact with landing pad
         self.leg_contacts = self._check_leg_contacts(True)
@@ -417,7 +425,7 @@ class Rocket:
         if self.render_mode == "human":
             self.render()
 
-        return ...
+        return ...#observation, reward, done, truncated, info
     
     def render(self):
 
@@ -428,10 +436,13 @@ class Rocket:
         pygame.draw.rect(self.particle_surf, (255, 255, 255), self.particle_surf.get_rect())
 
         for obj in self.particles:
-            obj[1] = (obj[1][0], obj[1][1] - (5 / randrange(1, FPS//2))) # Move the smoke upwards
+
+            NewTTL = (((obj[2] - 0) * 2) / 1) - 1
+
+            obj[1] = (obj[1][0], obj[1][1] + (randint(PARTICLE_Y_VEL_RANGE[0], PARTICLE_Y_VEL_RANGE[1]) / FPS) * NewTTL) # Move the smoke upwards
             obj[2] -= random() * PARTICLE_TTL_SUBTRACT # Take time from its lifetime
             obj[3] += PARTICLE_GROWTH_RATE if obj[3] < PARICLE_MAX_RADIUS else 0 # radius grows as the particle gets older
-            ttl = 1 - obj[2] #(1 / (1 + math.e ** -obj[2]))
+            ttl = 1 - obj[2]
             
             obj[4] = (
                 int(ttl * 255),
@@ -625,7 +636,7 @@ def run():
                     mouse_joint = pymunk.PivotJoint(
                         mouse_body, shape.body, (0, 0), shape.body.world_to_local(nearest)
                     )
-                    mouse_joint.max_force = 50000
+                    mouse_joint.max_force = 80000
                     mouse_joint.error_bias = (1 - 0.15) ** 60
                     env.space.add(mouse_joint)
 
@@ -637,10 +648,16 @@ def run():
         keys = pygame.key.get_pressed()
 
         # Input
-        if keys[pygame.K_w]: # Increase Throttle
+        if keys[pygame.K_LEFT]: # Increase Gimbal
+            action =  0
+        
+        elif keys[pygame.K_RIGHT]: # Decrease Gimbal
+            action =  1
+
+        elif keys[pygame.K_w]: # Increase Throttle
             action =  2
         
-        elif keys[pygame.K_s]: # Decrease Throttlew
+        elif keys[pygame.K_s]: # Decrease Throttle
             action =  3
         
         elif keys[pygame.K_a]:
