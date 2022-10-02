@@ -6,12 +6,16 @@ from random import randrange, random
 import numpy as np
 from typing import Optional
 
+# TODO
+# - Try to make a new body named "MainEngine" and use a joint to connect it to the rocket; 
+# In this way, you could apply a force and angle/gimbal to the engine and it would affect the entire rocket 
+
 pygame.init()
 
 # Display Setup
 
-VIEWPORT_WIDTH         = 1200
-VIEWPORT_HEIGHT        = 1012
+VIEWPORT_WIDTH         = 1920
+VIEWPORT_HEIGHT        = 1020
 WINDOW                 = pygame.display.set_mode((VIEWPORT_WIDTH, VIEWPORT_HEIGHT))
 CLOCK                  = pygame.time.Clock()
 
@@ -23,33 +27,38 @@ X_GRAVITY, Y_GRAVITY   = (0, 956 * SCALE)
 STARTING_POS           = (VIEWPORT_WIDTH//2, -200)
 
 # Sky
-SKY_COLOR              = (126, 150, 233)
+SKY_COLOR              = (212, 234, 255)
 
-# ROCKET
 MIN_THROTTLE           = 0.3
 GIMBAL_THRESHOLD       = 0.4
 MAIN_ENGINE_POWER      = 25000 * SCALE
 SIDE_ENGINE_POWER      = 25000 * SCALE
 
+# ROCKET
 ROCKET_WIDTH           = 40 * SCALE
 ROCKET_HEIGHT          = ROCKET_WIDTH * 5
 ROCKET_SIZE            = (ROCKET_WIDTH, ROCKET_HEIGHT)
 ROCKET_MASS            = 30 * SCALE
-
-# ENGINE_HEIGHT          = ROCKET_WIDTH * 0.5
-# ENGINE_WIDTH           = ENGINE_HEIGHT * 0.7
-
-FIRE_WIDTH             = ROCKET_WIDTH * 3
-FIRE_HEIGHT            = FIRE_WIDTH * 3.4
-
-COLD_GAS_WIDTH         = FIRE_WIDTH/1.4
-COLD_GAS_HEIGHT        = COLD_GAS_WIDTH * 3
-THRUSTER_HEIGHT        = (ROCKET_HEIGHT/2) * -0.86
-ENGINE_HEIGHT          = (ROCKET_HEIGHT/2) * 0.86
-
 ROCKET_ELASTICITY      = 0.1
 ROCKET_FRICTION        = 0.5
-ROCKET_COLOR           = (81, 79, 79, 250)
+ROCKET_COLOR           = (161, 159, 159, 250)
+
+# ENGINE
+ENGINE_SIZE            = (ROCKET_WIDTH * 0.4, ROCKET_WIDTH * 0.5)
+ENGINE_HEIGHT          = (ROCKET_HEIGHT/2) * 0.86
+ENGINE_MASS            = ROCKET_MASS * 0.1
+ENGINE_ELASTICITY      = 0.1
+ENGINE_FRICTION        = 0.5
+ENGINE_COLOR           = (111, 109, 109, 250)
+
+# FIRE_WIDTH             = ROCKET_WIDTH * 3
+# FIRE_HEIGHT            = FIRE_WIDTH * 3.4
+
+# COLD_GAS_WIDTH         = FIRE_WIDTH/1.4
+# COLD_GAS_HEIGHT        = COLD_GAS_WIDTH * 3
+
+# CONTROL THRUSTERS
+THRUSTER_HEIGHT        = (ROCKET_HEIGHT/2) * -0.86
 
 # LEGS
 LEG_HEIGHT             = ROCKET_SIZE[1] * 0.35
@@ -78,7 +87,7 @@ LANDING_PAD_POS        = (VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT - (WATER_HEIGHT) -
 
 LANDING_PAD_ELASTICITY = 0.3
 LANDING_PAD_FRICTION   = 0.7
-LANDING_PAD_COLOR      = (220, 234, 233, 97)
+LANDING_PAD_COLOR      = (50, 64, 63, 150)
 
 # SMOKE FOR VISUALS
 SMOKE_LIFETIME         = 0 # Lifetime
@@ -142,6 +151,8 @@ class Rocket:
         self.render_mode = render_mode
 
         self.isopen      = True
+        self.done        = False
+        self.truncated   = False
         
         self._setup()
 
@@ -160,15 +171,16 @@ class Rocket:
 
         self._create_water()
         
-        self.lander       = self._create_lander()
+        self.lander, self.mainEngine = self._create_lander()
 
-        self.legs         = []
-        self.leg_contacts = []
+        self.legs                    = []
+        self.leg_contacts            = []
         self._create_legs(self.lander.body)
 
-        self.landing_pad  = self._create_landing_pad()
+        self.landing_pad             = self._create_landing_pad()
     
     def _create_lander(self):
+        # Rocket
         size             = ROCKET_SIZE
         pos              = STARTING_POS
 
@@ -182,9 +194,31 @@ class Rocket:
         shape.elasticity = ROCKET_ELASTICITY
         shape.friction   = ROCKET_FRICTION
         shape.color      = ROCKET_COLOR
-        self.space.add(body, shape)
 
-        return shape
+        # Engine
+        body_engine, shape_engine      = self._create_engine(body.position)
+        # Here you should put a joint that attaches the engine to the rocket body
+
+        self.space.add(body, shape, body_engine, shape_engine)
+
+        return shape, shape_engine
+    
+    def _create_engine(self, pos):
+        size             = ENGINE_SIZE
+        pos              = STARTING_POS
+
+        inertia          = pymunk.moment_for_box(mass = ENGINE_MASS, size = size)
+
+        body             = pymunk.Body(mass = ENGINE_MASS, moment = inertia, body_type = pymunk.Body.DYNAMIC)
+        body.position    = pos
+
+        shape            = pymunk.Poly.create_box(body, size)
+        shape.mass       = ENGINE_MASS
+        shape.elasticity = ENGINE_ELASTICITY
+        shape.friction   = ENGINE_FRICTION
+        shape.color      = ENGINE_COLOR
+
+        return body, shape
     
     def _create_legs(self, rocket: pymunk.Body):
 
@@ -314,6 +348,8 @@ class Rocket:
         self.render_mode = self.render_mode
 
         self.isopen      = True
+        self.done        = False
+        self.truncated   = False
         
         self._setup()
 
@@ -322,9 +358,11 @@ class Rocket:
         # Apply random angular vel to the rocket
         if seed:
             np.random.seed(seed)
-        #self.lander.body.apply_impulse_at_local_point((np.random.randint(-200 * SCALE, 200 * SCALE, 1), 0), (0, -ROCKET_SIZE[1]/2))
+        self.lander.body.apply_impulse_at_local_point((np.random.randint(-200 * SCALE, 200 * SCALE, 1), 0), (0, -ROCKET_SIZE[1]/2))
     
     def step(self, action):
+        assert action != None
+
         self.force_dir = 0
 
         if action == 0:    # Gimbal left
