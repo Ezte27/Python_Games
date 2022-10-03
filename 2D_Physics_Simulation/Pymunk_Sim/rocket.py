@@ -6,6 +6,41 @@ from random import randint, randrange, random
 import numpy as np
 from typing import Optional
 
+"""
+
+The objective of this environment is to land a rocket on a ship.
+
+STATE VARIABLES
+The state consists of the following variables:
+    - x position
+    - y position
+    - angle
+    - first leg ground contact indicator
+    - second leg ground contact indicator
+    - throttle
+    - engine gimbal
+If VEL_STATE is set to true, the velocities are included:
+    - x velocity
+    - y velocity
+    - angular velocity
+    
+CONTROL INPUTS
+Discrete control inputs are:
+    - gimbal left
+    - gimbal right
+    - throttle up
+    - throttle down
+    - use first control thruster
+    - use second control thruster
+    - no action
+    
+Continuous control inputs are:
+    - gimbal (left/right)
+    - throttle (up/down)
+    - control thruster (left/right)
+
+"""
+
 # TODO
 # - Try to make a new body named "MainEngine" and use a joint to connect it to the rocket; 
 # In this way, you could apply a force and angle/gimbal to the engine and it would affect the entire rocket 
@@ -14,13 +49,20 @@ pygame.init()
 
 # Display Setup
 
-VIEWPORT_WIDTH         = 1920
+VIEWPORT_WIDTH         = 1000#1920
 VIEWPORT_HEIGHT        = 1020
 WINDOW                 = pygame.display.set_mode((VIEWPORT_WIDTH, VIEWPORT_HEIGHT))
 CLOCK                  = pygame.time.Clock()
+FONT                   = pygame.font.SysFont("ariel", 24)
 
 FPS                    = 60
 SCALE                  = 1 # Temporal Scaling, lower is faster - adjust forces appropriately
+
+
+# Environment Variables
+CONTINUOUS             = False
+MAX_STEP_NUMBER        = 1200
+LANDING_TICKS          = 100
 
 # Pymunk Space Setup
 X_GRAVITY, Y_GRAVITY   = (0, 956 * SCALE)
@@ -69,12 +111,6 @@ LEG_COLOR              = (220, 20, 30, 20)
 LEG_ELASTICITY         = 0.3
 LEG_FRICTION           = 0.6
 
-# LEG_LENGTH             = ROCKET_WIDTH * 3
-# LEG_WIDTH              = ROCKET_WIDTH * 0.8
-# BASE_ANGLE             = -0.27
-# SPRING_ANGLE           = 0.27
-# LEG_AWAY               = ROCKET_WIDTH / 2
-
 # WATER
 WATER_HEIGHT           = 80 * SCALE
 WATER_COLOR            = (0, 157, 196, 180)
@@ -83,7 +119,7 @@ WATER_COLOR            = (0, 157, 196, 180)
 LANDING_PAD_HEIGHT     = ROCKET_WIDTH * 0.6
 LANDING_PAD_WIDTH      = LANDING_PAD_HEIGHT * 18
 LANDING_PAD_SIZE       = (LANDING_PAD_WIDTH, LANDING_PAD_HEIGHT)
-LANDING_PAD_POS        = (VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT - (WATER_HEIGHT) - (LANDING_PAD_SIZE[1] / 2))
+LANDING_PAD_POS        = (VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT - (WATER_HEIGHT) - (LANDING_PAD_SIZE[1]/2))
 
 LANDING_PAD_ELASTICITY = 0.3
 LANDING_PAD_FRICTION   = 0.7
@@ -103,6 +139,60 @@ PARTICLE_Y_VEL_RANGE   = [100, 300]
 DRAW_FLAGS             = False
 
 class Rocket:
+    f'''
+
+    ### Description
+    This environment is a classic rocket trajectory optimization problem.
+    The objective of this environment is to land a rocket on a landing pad or ship.
+
+    There are two environment versions: discrete or continuous.
+    The landing pad is always at coordinates (0,0). The coordinates are the
+    first two numbers in the state vector.
+    Landing outside of the landing pad is NOT possible. Fuel is infinite but fuel consumption is penalized, so an agent
+    can learn to fly and then land on its first attempt.
+
+    ### Action Space
+    There are four discrete actions available: do nothing, fire left
+    orientation engine, fire main engine, fire right orientation engine.
+    Discrete control inputs are:
+        - gimbal left
+        - gimbal right
+        - throttle up
+        - throttle down
+        - use first control thruster
+        - use second control thruster
+        - no action
+    
+    Continuous control inputs are:
+        - gimbal (left/right)
+        - throttle (up/down)
+        - control thruster (left/right)
+
+    ### Observation Space
+    The state is an 8-dimensional vector: the coordinates of the lander in `x` & `y`, its linear
+    velocities in `x` & `y`, its angle, its angular velocity, and two booleans
+    that represent whether each leg is in contact with the ground or not.
+    The state consists of the following variables:
+        - x position        [-inf -- inf]
+        - y position        [-inf -- inf]
+        - x linear velocity [-inf -- inf]
+        - y linear velocity [-inf -- inf]
+        - angle             [-inf -- inf]
+        - angular velocity  [-inf -- inf]
+        # - throttle          [0 -- 1]
+        # - engine gimbal     [{-GIMBAL_THRESHOLD} -- {GIMBAL_THRESHOLD}]
+        - left leg ground contact indicator  [bool]
+        - right leg ground contact indicator [bool]
+
+    ### Rewards
+    After every step a reward is granted. The total reward of an episode is the
+    sum of the rewards for all the steps within that episode.
+
+    ### Version History
+    - v0: Initial version
+    - v1: ...
+
+    '''
 
     metadata = {
         "render_modes": ["human", "rgb_array"], 
@@ -118,14 +208,21 @@ class Rocket:
 
     ) -> None:
         '''
-        Create a Rocket object
+        Creates a Rocket environment
 
         :py:data:`Hello World!`
 
         :Parameters:
                 space : pymunk.Space
                     The basic unit of the pymunk simulation
+                render_mode : str
+                    The render mode for the simulation
+                gravity : tuple
+                    The gravitational force applied to all dynamic bodies in the simulation
+                clock : bool
+                    If True then pygame Clock is going to be initialized inside the environment
         '''
+
         if space is None:
             self.space = pymunk.Space()
 
@@ -140,31 +237,35 @@ class Rocket:
             raise Exception(f"The Render Mode provided is not available. \n Available Render Modes = {self.metadata['render_modes']}")
 
         if self.screen is None and render_mode == "human":
-            self.screen = pygame.display.set_mode((VIEWPORT_WIDTH, VIEWPORT_HEIGHT))
+            self.screen   = pygame.display.set_mode((VIEWPORT_WIDTH, VIEWPORT_HEIGHT))
             print("[WARNING] pygame display NOT defined")
         
         if clock:
-            self.clock   = pygame.time.Clock()
+            self.clock    = pygame.time.Clock()
         else:
-            self.clock   = None
+            self.clock    = None
 
-        self.dt          = 1 / self.metadata['render_fps']
-        self.render_mode = render_mode
+        self.dt           = 1 / self.metadata['render_fps']
+        self.render_mode  = render_mode
 
-        self.isopen      = True
-        self.done        = False
-        self.truncated   = False
+        self.isopen       = True
+        self.done         = False
+        self.truncated    = False
+        self.prev_shaping = None
         
         self._setup()
 
-        self.throttle    = 0
-        self.gimbal      = 0.0
-        self.power       = 0
-        self.force_dir   = 0
+        self.throttle     = 0
+        self.gimbal       = 0.0
+        self.power        = 0
+        self.force_dir    = 0
 
-        self.engine_pos  = ()
+        self.engine_pos   = ()
 
-        self.particles   = []
+        self.particles    = []
+
+        self.stepNumber   = 0
+        self.landingTicks = 0
 
         self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
     
@@ -350,8 +451,9 @@ class Rocket:
         self.dt          = 1 / self.metadata['render_fps']
         self.render_mode = self.render_mode
 
-        self.isopen      = True
-        self.done        = False
+        self.isopen       = True
+        self.done         = False
+        self.prev_shaping = None
         
         self._setup()
 
@@ -365,7 +467,9 @@ class Rocket:
         return ...#observation, info
     
     def step(self, action):
-        assert action != None
+        assert action != None, "Action is None"
+
+        self.stepNumber += 1
 
         self.force_dir = 0
 
@@ -383,6 +487,12 @@ class Rocket:
             self.force_dir = 1
         else:              # No action
             ...
+
+        # Declaring important variables
+        reward    = 0
+        done      = False
+        truncated = False
+        info      = {}
 
         self.gimbal = np.clip(self.gimbal, -GIMBAL_THRESHOLD, GIMBAL_THRESHOLD)
         self.throttle = np.clip(self.throttle, 0.0, 1.0)
@@ -420,12 +530,66 @@ class Rocket:
         # Checking for leg contact with landing pad
         self.leg_contacts = self._check_leg_contacts(True)
 
+        # Observation
+        pos    = self.lander.body.position
+        vel    = self.lander.body.velocity
+        angVel = self.lander.body.angular_velocity
+
+        state = [
+            (pos.x - VIEWPORT_WIDTH / 2) / (VIEWPORT_WIDTH / 2),
+            (-pos.y + (LANDING_PAD_POS[1] - LEG_SIZE[1]/2 - ROCKET_SIZE[1]/2)) / (VIEWPORT_HEIGHT),
+            vel.x,
+            vel.y,
+            self.lander.body.angle,
+            20.0 * angVel / FPS,
+            1.0 if self.leg_contacts[0] else 0.0,
+            1.0 if self.leg_contacts[1] else 0.0,
+        ]
+
+        # Reward
+        outside = True if abs(state[0]) > 1.5 or abs(state[1]) > 1.5 else False
+        landed = state[6] and state[7] and vel.x < 0.3 and vel.y < 0.2
+
+        shaping = (
+            -100 * np.sqrt(state[0] * state[0] + state[1] * state[1])
+            - 100 * np.sqrt(state[2] * state[2] + state[3] * state[3])
+            - 100 * abs(state[4])
+            - 50 * abs(state[5])
+            + 15 * state[6]
+            + 15 * state[7]
+        )  # Fifteen points for each leg contact
+           # If you lose contact after landing, you get negative reward
+        
+        if self.prev_shaping is not None:
+            reward = shaping - self.prev_shaping
+        self.prev_shaping = shaping
+
+        reward -= self.power * 0.10 # less fuel spent is better, about -30 for heuristic landing
+        reward -= abs(self.force_dir) * 0.03
+
+        if outside:
+            done   = True
+            reward = -150
+        
+        if not all(self.leg_contacts):
+            reward -= 0.25 / FPS
+
+        if self.stepNumber >= MAX_STEP_NUMBER:
+            truncated = True
+        
+        if landed:
+            if self.landingTicks >= LANDING_TICKS:
+                done   = True
+                reward = +250
+            else:
+                self.landingTicks += 1
+
         self.space.step(self.dt)
 
         if self.render_mode == "human":
             self.render()
 
-        return ...#observation, reward, done, truncated, info
+        return np.array(state, dtype=np.float32), reward, done, truncated, info # observation, reward, done, truncated, info
     
     def render(self):
 
@@ -530,6 +694,9 @@ class Rocket:
         #surf_trans = pygame.transform.rotate(surf, math.degrees(self.lander.body.angle))
         #rect = surf_trans.get_rect(center = self.lander.body.position)
 
+        font_surf = FONT.render(str(self.stepNumber), False, "Black")
+        font_rect = font_surf.get_rect(topleft = (20, 20))
+
         if self.render_mode == "human":
             assert self.screen is not None, "Screen is NONE"
 
@@ -539,7 +706,9 @@ class Rocket:
 
             self.space.debug_draw(self.draw_options)
 
-            pygame.draw.circle(self.screen, (255, 255, 255), self.debug, 10)
+            self.screen.blit(font_surf, font_rect)
+
+            #pygame.draw.circle(self.screen, (255, 255, 255), self.debug, 10)
 
             pygame.event.pump()
 
@@ -678,7 +847,8 @@ def run():
             action = 6
 
         # Step
-        env.step(action)
+        observation, reward, done, truncated, _ = env.step(action)
+        print(reward) if not (done or truncated) else print("FINISHED SIMULATION")
 
         # Mouse Interaction
         mouse_pos = pygame.mouse.get_pos()
