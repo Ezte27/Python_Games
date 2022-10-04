@@ -5,6 +5,8 @@ import math
 from random import randint, randrange, random
 import numpy as np
 from typing import Optional
+import gym
+from gym import spaces
 
 """
 
@@ -55,7 +57,7 @@ WINDOW                 = pygame.display.set_mode((VIEWPORT_WIDTH, VIEWPORT_HEIGH
 CLOCK                  = pygame.time.Clock()
 FONT                   = pygame.font.SysFont("ariel", 24)
 
-FPS                    = 60
+FPS                    = 30
 SCALE                  = 1 # Temporal Scaling, lower is faster - adjust forces appropriately
 
 
@@ -138,7 +140,7 @@ PARTICLE_Y_VEL_RANGE   = [100, 300]
 # OTHER
 DRAW_FLAGS             = False
 
-class Rocket:
+class Rocket(gym.Env):
     f'''
 
     ### Description
@@ -222,6 +224,7 @@ class Rocket:
                 clock : bool
                     If True then pygame Clock is going to be initialized inside the environment
         '''
+        super(Rocket, self).__init__()
 
         if space is None:
             self.space = pymunk.Space()
@@ -231,10 +234,10 @@ class Rocket:
 
         self.space.gravity = gravity
 
-        self.screen  = pygame.display.get_surface()
-
         if render_mode not in self.metadata['render_modes']:
             raise Exception(f"The Render Mode provided is not available. \n Available Render Modes = {self.metadata['render_modes']}")
+
+        self.screen  = pygame.display.get_surface()
 
         if self.screen is None and render_mode == "human":
             self.screen   = pygame.display.set_mode((VIEWPORT_WIDTH, VIEWPORT_HEIGHT))
@@ -248,26 +251,57 @@ class Rocket:
         self.dt           = 1 / self.metadata['render_fps']
         self.render_mode  = render_mode
 
-        self.isopen       = True
-        self.done         = False
-        self.truncated    = False
-        self.prev_shaping = None
+        low = np.array(
+            [
+                # these are bounds for position
+                # realistically the environment should have ended
+                # long before we reach more than 50% outside
+                -1.5,
+                -1.5,
+                # velocity bounds is 5x rated speed
+                -5.0,
+                -5.0,
+                -math.pi,
+                -5.0,
+                -0.0,
+                -0.0,
+            ],
+            dtype = np.float32
+        )
+
+        high = np.array(
+            [
+                # these are bounds for position
+                # realistically the environment should have ended
+                # long before we reach more than 50% outside
+                1.5,
+                1.5,
+                # velocity bounds is 5x rated speed
+                5.0,
+                5.0,
+                math.pi,
+                5.0,
+                1.0,
+                1.0,
+            ],
+            dtype = np.float32
+        )
+
+        # useful range is -1 .. +1, but spikes can be higher
+        self.observation_space = spaces.Box(low, high, shape = (8,), dtype = np.float32)
         
-        self._setup()
+        if CONTINUOUS:
+            # Action is two floats [main engine, left-right engines].
+            # Main engine: -1..0 off, 0..+1 throttle from 0% to 100% power.
+            # Left-right:  -1.0..-0.5 fire left engine, +0.5..+1.0 fire right engine, -0.5..0.5 off
+            self.action_space = spaces.Box(-1, +1, (2,), dtype=np.float32)
 
-        self.throttle     = 0
-        self.gimbal       = 0.0
-        self.power        = 0
-        self.force_dir    = 0
-
-        self.engine_pos   = ()
-
-        self.particles    = []
-
-        self.stepNumber   = 0
-        self.landingTicks = 0
-
-        self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
+        else:
+            # TODO: Make main engine throttle 0 or 1 (binary action) only. Easier for the ai to learn
+            # Gimbal left, Gimbal right, Increase Throttle, Decrease Throttle, left control thruster, right control thruster, and No action
+            self.action_space = spaces.Discrete(7)
+        
+        self.reset()
     
     def _setup(self,):
 
@@ -412,23 +446,30 @@ class Rocket:
         return contacts
     
     def _destroy(self):
-        self.space = None
+        self.space        = None
 
-        self.lander = None
-        self.water  = None
-        self.landing_pad = None
-        self.legs   = []
+        self.lander       = None
+        self.mainEngine   = None
+        self.water        = None
+        self.landing_pad  = None
+        self.legs         = []
         self.leg_contacts = []
 
-        self.screen  = None
+        self.screen       = None
 
-        self.dt          = 0
+        self.dt           = 0
 
-        self.throttle   = 0
-        self.gimbal     = 0.0
-        self.power      = 0
-        self.force_dir  = 0
-        self.engine_pos = ()
+        self.throttle     = 0
+        self.gimbal       = 0.0
+        self.power        = 0
+        self.force_dir    = 0
+
+        self.engine_pos   = ()
+
+        self.particles    = []
+
+        self.stepNumber   = 0
+        self.landingTicks = 0
 
         self.draw_options = None
 
@@ -453,6 +494,7 @@ class Rocket:
 
         self.isopen       = True
         self.done         = False
+        self.truncated    = False
         self.prev_shaping = None
         
         self._setup()
@@ -730,47 +772,6 @@ class Rocket:
             pygame.quit()
             self.isopen = False
 
-def draw(space, window, draw_options, line):
-    window.fill('white')
-    if line:
-        pygame.draw.line(window, 'black', line[0], line[1])
-    space.debug_draw(draw_options)
-    pygame.display.update()
-
-def calculate_distance(p1, p2):
-    return math.sqrt((p2[1] - p1[1])**2 + (p2[0] - p1[0])**2)
-
-def calculate_angle(p1, p2):
-    return math.atan2(p2[1] - p1[1], p2[0] - p1[0])
-
-def create_boundaries(space, width, height):
-    rects = [
-        [(width/2, height - 10), (width, 20)],
-        [(width/2, 10), (width, 20)],
-        [(10, height/2), (20, height)],
-        [(width - 10, height/2), (20, height)],
-    ]
-
-    for pos, size in rects:
-        body = pymunk.Body(body_type = pymunk.Body.STATIC)
-        body.position = pos
-        shape = pymunk.Poly.create_box(body, size)
-        shape.elasticity = 0.4
-        shape.friction = 0.5
-        shape.color = (20, 20, 20, 97)
-        space.add(body, shape)
-
-def create_circle(space, radius, mass, pos):
-    body = pymunk.Body(body_type = pymunk.Body.STATIC)
-    body.position = (pos)
-    shape = pymunk.Circle(body, radius)
-    shape.mass = mass
-    shape.elasticity = 0.7
-    shape.friction = 0.3
-    shape.color = (255, 0, 0, 100)
-    space.add(body, shape)
-    return shape
-
 def run():
 
     #create_boundaries(space, width, height)
@@ -857,6 +858,7 @@ def run():
         CLOCK.tick(FPS)
 
         pygame.display.set_caption(f"fps: {CLOCK.get_fps()}")
+    env.close()
 
-run()
-pygame.quit()
+if __name__ == '__main__':
+    run()
