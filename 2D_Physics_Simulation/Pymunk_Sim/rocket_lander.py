@@ -127,6 +127,8 @@ LANDING_PAD_ELASTICITY = 0.3
 LANDING_PAD_FRICTION   = 0.7
 LANDING_PAD_COLOR      = (50, 64, 63, 150)
 
+CRASHING_SPEED         = 150
+
 # SMOKE FOR VISUALS
 SMOKE_LIFETIME         = 0 # Lifetime
 PARTICLE_TTL_SUBTRACT  = (1 / FPS)  # Amount to subtract ttl per frame
@@ -598,6 +600,7 @@ class Rocket(gym.Env):
         # Reward
         outside = True if abs(state[0]) > 1.5 or abs(state[1]) > 1.5 else False
         landed = state[6] and state[7] and vel.x < 0.3 and vel.y < 0.2
+        crashed = False
 
         shaping = (
             -100 * np.sqrt(state[0] * state[0] + state[1] * state[1])
@@ -615,23 +618,30 @@ class Rocket(gym.Env):
 
         reward -= self.power * 0.10 # less fuel spent is better, about -30 for heuristic landing
         reward -= abs(self.force_dir) * 0.03
-
-        if outside:
-            done   = True
-            reward = -150
+        
+        if (state[3] >= CRASHING_SPEED) and (any(self.leg_contacts)):
+            crashed = True
+            print("CRASHED")
         
         if not all(self.leg_contacts):
-            reward -= 0.25 / FPS
+            reward -= 0.15 / FPS
 
         if self.stepNumber >= MAX_STEP_NUMBER:
             truncated = True
         
-        if landed:
+        if landed and not crashed:
             if self.landingTicks >= LANDING_TICKS:
                 done   = True
                 reward = +250
             else:
+                if self.landingTicks == 0: # Just landed
+                    ...
                 self.landingTicks += 1
+                reward += 2.6 / FPS
+        
+        if outside or crashed:
+            done   = True
+            reward = -120
 
         self.space.step(self.dt)
 
@@ -856,7 +866,7 @@ def run():
 
         # Step
         observation, reward, done, truncated, _ = env.step(action)
-        print(reward) if not (done or truncated) else print("FINISHED SIMULATION")
+        #print(reward) if not (done or truncated) else print("FINISHED SIMULATION")
 
         # Mouse Interaction
         mouse_pos = pygame.mouse.get_pos()
