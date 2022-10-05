@@ -127,7 +127,7 @@ LANDING_PAD_ELASTICITY = 0.3
 LANDING_PAD_FRICTION   = 0.7
 LANDING_PAD_COLOR      = (50, 64, 63, 150)
 
-CRASHING_SPEED         = 150
+CRASHING_SPEED         = 0.12
 
 # SMOKE FOR VISUALS
 SMOKE_LIFETIME         = 0 # Lifetime
@@ -261,8 +261,8 @@ class Rocket(gym.Env):
                 -1.5,
                 -1.5,
                 # velocity bounds is 5x rated speed
-                -5.0,
-                -5.0,
+                -1.0,
+                -1.0,
                 -math.pi,
                 -5.0,
                 -0.0,
@@ -278,9 +278,9 @@ class Rocket(gym.Env):
                 # long before we reach more than 50% outside
                 1.5,
                 1.5,
-                # velocity bounds is 5x rated speed
-                5.0,
-                5.0,
+                # velocity bounds is 1x rated speed
+                1.0,
+                1.0,
                 math.pi,
                 5.0,
                 1.0,
@@ -586,16 +586,16 @@ class Rocket(gym.Env):
         vel    = self.lander.body.velocity
         angVel = self.lander.body.angular_velocity
 
-        state = [
+        state = np.array([
             (pos.x - VIEWPORT_WIDTH / 2) / (VIEWPORT_WIDTH / 2),
             (-pos.y + (LANDING_PAD_POS[1] - LEG_SIZE[1]/2 - ROCKET_SIZE[1]/2)) / (VIEWPORT_HEIGHT),
-            vel.x,
-            vel.y,
+            vel.x / 1000,
+            vel.y / 1000,
             self.lander.body.angle,
             20.0 * angVel / FPS,
             1.0 if self.leg_contacts[0] else 0.0,
             1.0 if self.leg_contacts[1] else 0.0,
-        ]
+        ], dtype = np.float32)
 
         # Reward
         outside = True if abs(state[0]) > 1.5 or abs(state[1]) > 1.5 else False
