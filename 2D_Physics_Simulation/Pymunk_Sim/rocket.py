@@ -74,8 +74,8 @@ STARTING_POS           = (VIEWPORT_WIDTH//2, -200)
 SKY_COLOR              = (212, 234, 255)
 
 MIN_THROTTLE           = 0.3
-GIMBAL_THRESHOLD       = 0.2
-MAIN_ENGINE_POWER      = 25000 * SCALE
+GIMBAL_THRESHOLD       = 0.15
+MAIN_ENGINE_POWER      = 24000 * SCALE
 SIDE_ENGINE_POWER      = 6000 * SCALE
 
 # ROCKET
@@ -334,11 +334,11 @@ class Rocket(gym.Env):
         # Engine
         body_engine, shape_engine      = self._create_engine((body.position[0], body.position[1] + (ROCKET_SIZE[1] / 2) + ((ENGINE_SIZE[1] / 2) * 1.05)))
 
-        # A PinJoint connecting the leg and the rocket
-        pinjoint = pymunk.PinJoint(body_engine, body, (0, (-ENGINE_SIZE[1] / 2) * 1.05), (0, ROCKET_SIZE[1] / 2))
-        pinjoint.max_force = 500000 * SCALE * 2
+        # A PivotJoint connecting the engine and the rocket
+        pivotjoint = pymunk.PivotJoint(body_engine, body, (0, (-ENGINE_SIZE[1] / 2) * 1.05), (0, ROCKET_SIZE[1] / 2))
+        pivotjoint.max_force = 500000 * SCALE * 2
 
-        self.space.add(body, shape, body_engine, shape_engine, pinjoint)
+        self.space.add(body, shape, body_engine, shape_engine, pivotjoint)
 
         return shape, shape_engine
     
@@ -348,7 +348,7 @@ class Rocket(gym.Env):
         inertia          = pymunk.moment_for_box(mass = ENGINE_MASS, size = size)
 
         body             = pymunk.Body(mass = ENGINE_MASS, moment = inertia, body_type = pymunk.Body.DYNAMIC)
-        body.position    = pos
+        body.position    = (pos[0], pos[1])
 
         shape            = pymunk.Poly.create_box(body, size)
         shape.mass       = ENGINE_MASS
@@ -377,25 +377,30 @@ class Rocket(gym.Env):
             shape.friction   = LEG_FRICTION
             shape.color      = LEG_COLOR
 
-            # A PinJoint connecting the leg and the rocket
-            pinjoint = pymunk.PinJoint(body, rocket, (-leg_side * LEG_SIZE[0]/2, -LEG_SIZE[1] / 2), (leg_side * ROCKET_SIZE[0]/2, LEG_HEIGHT))
+            # A PivotJoint connecting the leg and the rocket
+            #pinjoint = pymunk.PinJoint(body, rocket, (-leg_side * LEG_SIZE[0]/2, -LEG_SIZE[1] / 2), (leg_side * ROCKET_SIZE[0]/2, LEG_HEIGHT))
+            pivotjoint = pymunk.PivotJoint(body, rocket, (-leg_side * LEG_SIZE[0]/2, -LEG_SIZE[1] / 2), (leg_side * ROCKET_SIZE[0]/2, LEG_HEIGHT))
+            pivotjoint.max_force = 80000 * SCALE * 2
 
             # A SlideJoint connecting the leg and the rocket
-            slidejoint = pymunk.SlideJoint(body, rocket, (leg_side * LEG_SIZE[0]/2, LEG_SIZE[1] / 2.6), (leg_side * ROCKET_SIZE[0]/2, LEG_SPRING_HEIGHT), 100 * SCALE, 115 * SCALE)
-            slidejoint.max_force = 50000 * SCALE * 2
+            # slidejoint = pymunk.SlideJoint(body, rocket, (leg_side * LEG_SIZE[0]/2, LEG_SIZE[1] / 2.6), (leg_side * ROCKET_SIZE[0]/2, LEG_SPRING_HEIGHT), 100 * SCALE, 115 * SCALE)
+            # slidejoint.max_force = 50000 * SCALE * 2
 
             # A SpringJoint connecting the leg and the rocket
-            springjoint = pymunk.DampedSpring(body, rocket, (leg_side * LEG_SIZE[0]/2, LEG_SIZE[1] / 2.6), (leg_side * ROCKET_SIZE[0]/2, LEG_SPRING_HEIGHT), -30000 * SCALE, -2.5, 10)
-            springjoint.max_force = 8000 * SCALE * 2
+            springjoint = pymunk.DampedSpring(body, rocket, (leg_side * LEG_SIZE[0]/2, LEG_SIZE[1] / 2.6), (leg_side * ROCKET_SIZE[0]/2, LEG_SPRING_HEIGHT), -16000 * SCALE, -2.5, 30)
 
             self.legs.append(shape)
 
-            self.space.add(body, shape, pinjoint, slidejoint, springjoint)
+            self.space.add(body, shape, pivotjoint, springjoint)
         
         # A SpringJoint connecting both legs
-        springjoint = pymunk.DampedSpring(self.legs[0].body, self.legs[1].body, (LEG_SIZE[0]/2, LEG_SIZE[1] / 3), (-LEG_SIZE[0]/2, LEG_SIZE[1] / 3), -1000 * SCALE, -2.5, 10)
-        springjoint.max_force = 8000 * SCALE * 2
-        self.space.add(springjoint)
+        springjoint = pymunk.DampedSpring(self.legs[0].body, self.legs[1].body, (LEG_SIZE[0]/2, LEG_SIZE[1] / 3), (-LEG_SIZE[0]/2, LEG_SIZE[1] / 3), -4000 * SCALE, -2.5, 40)
+        
+        # A SlideJoint connecting both legs
+        slidejoint  = pymunk.SlideJoint(self.legs[0].body, self.legs[1].body, (LEG_SIZE[0]/2, LEG_SIZE[1] / 3), (-LEG_SIZE[0]/2, LEG_SIZE[1] / 3), 0 * SCALE, 135 * SCALE)
+        slidejoint.max_force = 50000 * SCALE * 2
+  
+        self.space.add(springjoint, slidejoint)
     
     def _create_water(self):
         water_body          = pymunk.Body(body_type=pymunk.Body.STATIC)
@@ -521,8 +526,10 @@ class Rocket(gym.Env):
             self.gimbal -= 0.01
         elif action == 2:  # Increase Throttle
             self.throttle += 0.01
+            self.throttle = 1.00
         elif action == 3:  # Decrease Throttle
             self.throttle -= 0.01
+            self.throttle = 0.00
         elif action == 4:  # left control thruster
             self.force_dir = -1
         elif action == 5:  # right control thruster
