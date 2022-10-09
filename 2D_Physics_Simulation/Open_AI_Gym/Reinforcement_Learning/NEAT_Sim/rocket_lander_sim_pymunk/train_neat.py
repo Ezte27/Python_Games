@@ -3,7 +3,7 @@ Booster lander experiment using a feed-forward neural network.
 """
 
 import multiprocessing
-import os
+import os, time
 import pickle
 
 import neat
@@ -14,8 +14,20 @@ from visualize import plot_stats, plot_species
 import gym
 import rocket_lander
 
-CHECKPOINT_INTERVAL = 15
-MAX_GENERATIONS     = 20
+local_dir       = os.path.dirname(__file__)
+config_path     = os.path.join(local_dir, 'config.txt')
+
+CHECKPOINTS         = True
+CHECKPOINT_INTERVAL = 1
+MAX_GENERATIONS     = 5
+
+if CHECKPOINTS:
+    checkpoint_name = f"checkpoint_{round(time.time(), ndigits=4) * 1000}"
+    checkpoint_path = os.path.join(local_dir, 'checkpoints', checkpoint_name)
+    try:
+        os.mkdir(checkpoint_path)
+    except FileExistsError:
+        raise Exception("You tried to make a dir for NEAT checkpoints reporter but the dir already exists!")
 
 runs_per_net = 2
 
@@ -55,32 +67,32 @@ def eval_genomes(genomes, config):
 def run():
     # Load the config file, which is assumed to live in
     # the same directory as this script.
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'config.txt')
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_path)
 
     pop = neat.Population(config)
-    #pop = neat.Checkpointer.restore_checkpoint(os.path.join(local_dir, 'neat-checkpoint-797'))
+    #pop = neat.Checkpointer.restore_checkpoint(checkpoint_path)
     
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
     pop.add_reporter(neat.StdOutReporter(True))
-    pop.add_reporter(neat.Checkpointer(CHECKPOINT_INTERVAL))
+    
+    if CHECKPOINTS:
+        pop.add_reporter(neat.Checkpointer(CHECKPOINT_INTERVAL, filename_prefix = checkpoint_path + '\\gen_'))
 
     pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
     winner = pop.run(pe.evaluate, MAX_GENERATIONS)
 
-    # Save the winner.
-    with open(os.path.join(local_dir, 'stats/winner.pickle'), 'wb') as f:
-        pickle.dump(winner, f)
+    # # Save the winner.
+    # with open(os.path.join(local_dir, 'stats/winner.pickle'), 'wb') as f:
+    #     pickle.dump(winner, f)
 
     print(winner)
 
-    # Display the results
-    plot_stats(stats, ylog=False, view=True, filename=os.path.join(local_dir, "stats/feedforward-fitness.png"))
-    plot_species(stats, view=True, filename=os.path.join(local_dir, "stats/feedforward-speciation.png"))
+    # # Display the results
+    # plot_stats(stats, ylog=False, view=True, filename=os.path.join(local_dir, "stats/feedforward-fitness.png"))
+    # plot_species(stats, view=True, filename=os.path.join(local_dir, "stats/feedforward-speciation.png"))
 
 if __name__ == '__main__':
     run()
