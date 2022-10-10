@@ -4,8 +4,8 @@ import os
 
 local_dir   = os.path.dirname(__file__)
 models_dir  = "models"
-model_name = input("Input the name of the folder and model separated by a comma [folder_name, model_num.zip]: ").strip(" ").replace(",", "/").replace(".zip", "")
-model_path = f"{models_dir}/{models_dir}.zip"
+model_name = input("Input the name of the folder and model [folder_name/model_num.zip]: ").strip(" ")
+model_path = f"{models_dir}/{model_name}"
 
 EPISODES    = 10
 
