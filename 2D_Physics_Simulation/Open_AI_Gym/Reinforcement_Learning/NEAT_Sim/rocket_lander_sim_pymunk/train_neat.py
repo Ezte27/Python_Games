@@ -22,12 +22,14 @@ CHECKPOINT_INTERVAL = 1
 MAX_GENERATIONS     = 5
 
 if CHECKPOINTS:
-    checkpoint_name = f"checkpoint_{round(time.time(), ndigits=4) * 1000}"
+    checkpoint_name = f"checkpoint_{round(time.time() * 0.01)}"
     checkpoint_path = os.path.join(local_dir, 'checkpoints', checkpoint_name)
+
     try:
         os.mkdir(checkpoint_path)
     except FileExistsError:
-        raise Exception("You tried to make a dir for NEAT checkpoints reporter but the dir already exists!")
+        pass
+        #raise Exception("You tried to make a dir for NEAT checkpoints reporter but the dir already exists!")
 
 runs_per_net = 2
 
@@ -77,7 +79,7 @@ def run():
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
     pop.add_reporter(neat.StdOutReporter(True))
-    
+
     if CHECKPOINTS:
         pop.add_reporter(neat.Checkpointer(CHECKPOINT_INTERVAL, filename_prefix = checkpoint_path + '\\gen_'))
 
