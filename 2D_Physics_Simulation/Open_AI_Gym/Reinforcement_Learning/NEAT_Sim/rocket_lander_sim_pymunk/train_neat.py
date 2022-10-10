@@ -86,15 +86,15 @@ def run():
     pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
     winner = pop.run(pe.evaluate, MAX_GENERATIONS)
 
-    # # Save the winner.
-    # with open(os.path.join(local_dir, 'stats/winner.pickle'), 'wb') as f:
-    #     pickle.dump(winner, f)
+    # Save the winner.
+    with open(os.path.join(local_dir, 'stats/winner.pickle'), 'wb') as f:
+        pickle.dump(winner, f)
 
     print(winner)
 
-    # # Display the results
-    # plot_stats(stats, ylog=False, view=True, filename=os.path.join(local_dir, "stats/feedforward-fitness.png"))
-    # plot_species(stats, view=True, filename=os.path.join(local_dir, "stats/feedforward-speciation.png"))
+    # Display the results
+    plot_stats(stats, ylog=False, view=True, filename=os.path.join(local_dir, "stats/feedforward-fitness.png"))
+    plot_species(stats, view=True, filename=os.path.join(local_dir, "stats/feedforward-speciation.png"))
 
 if __name__ == '__main__':
     run()
