@@ -18,8 +18,8 @@ local_dir       = os.path.dirname(__file__)
 config_path     = os.path.join(local_dir, 'config.txt')
 
 CHECKPOINTS         = True
-CHECKPOINT_INTERVAL = 1
-MAX_GENERATIONS     = 5
+CHECKPOINT_INTERVAL = 15
+MAX_GENERATIONS     = 250
 
 if CHECKPOINTS:
     checkpoint_name = f"checkpoint_{round(time.time() * 0.01)}"
