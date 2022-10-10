@@ -13,7 +13,7 @@ FPS = 40
 SLOW_MODE = True
 
 local_dir = os.path.dirname(__file__)
-genome_path = 'stats\winners\winner_16653831.pickle'
+genome_path = 'stats\winners\winner_16653835.pickle'
 full_path = os.path.join(local_dir, genome_path)
 
 try:
