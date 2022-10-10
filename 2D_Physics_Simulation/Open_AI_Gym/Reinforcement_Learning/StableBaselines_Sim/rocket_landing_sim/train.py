@@ -22,7 +22,7 @@ observation = env.reset()
 print("action space shape: ", env.action_space.shape)
 print("observation space shape: ", env.observation_space.shape)
 
-print("\nChecking Gym Environment ...\n")
+print("\nChecking Gym Environment ...")
 check_env(env)
 
 print(f"\nThe training has {Fore.GREEN}STARTED SUCCESSFULLY{Fore.RESET}")
