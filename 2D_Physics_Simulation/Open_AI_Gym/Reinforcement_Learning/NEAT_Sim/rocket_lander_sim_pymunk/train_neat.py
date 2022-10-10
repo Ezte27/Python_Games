@@ -18,8 +18,8 @@ local_dir       = os.path.dirname(__file__)
 config_path     = os.path.join(local_dir, 'config.txt')
 
 CHECKPOINTS         = True
-CHECKPOINT_INTERVAL = 15
-MAX_GENERATIONS     = 250
+CHECKPOINT_INTERVAL = 50
+MAX_GENERATIONS     = 1000
 
 if CHECKPOINTS:
     checkpoint_name = f"checkpoint_{round(time.time() * 0.01)}"
@@ -85,16 +85,19 @@ def run():
 
     pe = neat.ParallelEvaluator(multiprocessing.cpu_count(), eval_genome)
     winner = pop.run(pe.evaluate, MAX_GENERATIONS)
-
+    
+    current_time        = round(time.time() * 0.01)
+    winner_name = f"winner_{current_time}.pickle"
+    winner_path = os.path.join(local_dir, 'stats/winners/' + winner_name)
     # Save the winner.
-    with open(os.path.join(local_dir, 'stats/winner.pickle'), 'wb') as f:
+    with open(winner_path, 'wb') as f:
         pickle.dump(winner, f)
 
     print(winner)
 
     # Display the results
-    plot_stats(stats, ylog=False, view=True, filename=os.path.join(local_dir, "stats/feedforward-fitness.png"))
-    plot_species(stats, view=True, filename=os.path.join(local_dir, "stats/feedforward-speciation.png"))
+    plot_stats(stats, ylog=False, view=True, filename=os.path.join(local_dir, f"stats/feedforward-fitness/{current_time}.png"))
+    plot_species(stats, view=True, filename=os.path.join(local_dir, f"stats/feedforward-speciation/{current_time}.png"))
 
 if __name__ == '__main__':
     run()

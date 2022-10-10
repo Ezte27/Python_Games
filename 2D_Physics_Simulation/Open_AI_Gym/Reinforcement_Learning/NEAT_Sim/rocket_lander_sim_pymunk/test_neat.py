@@ -13,7 +13,7 @@ FPS = 40
 SLOW_MODE = True
 
 local_dir = os.path.dirname(__file__)
-genome_path = 'stats/winner.pickle'
+genome_path = 'stats/winners/winner_16653718.pickle'
 full_path = os.path.join(local_dir, genome_path)
 
 try:
@@ -85,7 +85,7 @@ while runs < MAX_RUNS:
         observation, reward, done, truncated, info = env.step(action)
     else:
         observation, reward, done, truncated, info = env.step(action)
-        
+
     steps += 1
     reward_per_step.append(reward)
 
