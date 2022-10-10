@@ -3,9 +3,10 @@ from stable_baselines3 import A2C, PPO
 import os
 
 local_dir   = os.path.dirname(__file__)
-models_dir  = "models/PPO"
-model_path = f"{models_dir}/20000.zip"
-log_dir     = "logs"
+models_dir  = "models"
+model_name = input("Input the name of the folder and model separated by a comma [folder_name, model_num.zip]: ").strip(" ").replace(",", "/").replace(".zip", "")
+model_path = f"{models_dir}/{models_dir}.zip"
+
 EPISODES    = 10
 
 env = gym.make("LunarLander-v2")
