@@ -82,9 +82,9 @@ while runs < MAX_RUNS:
         action = env.action_space.sample()
     
     if SLOW_MODE and (steps % 100 == 0):
-        observation, reward, done, truncated, info = env.step(action)
+        observation, reward, done, info = env.step(action)
     else:
-        observation, reward, done, truncated, info = env.step(action)
+        observation, reward, done, info = env.step(action)
 
     steps += 1
     reward_per_step.append(reward)
