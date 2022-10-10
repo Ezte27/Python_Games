@@ -93,10 +93,12 @@ while runs < MAX_RUNS:
         runs += 1
         observation, info = env.reset()
 
-    try:
-        print(f"Observation: {Fore.BLUE}{observation}{Fore.RESET}, Reward: {Fore.GREEN if reward > 0 else Fore.RED}{reward}{Fore.RESET}")
-    except NameError:
-        print(f"Observation: {observation}, Reward: {reward}")
+    # try:
+    #     print(f"Observation: {Fore.BLUE}{observation}{Fore.RESET}, Reward: {Fore.GREEN if reward > 0 else Fore.RED}{reward}{Fore.RESET}")
+    # except NameError:
+    #     print(f"Observation: {observation}, Reward: {reward}")
+
+    print(f"Action: {action}")
         
     if (done or truncated): print("FINISHED SIMULATION")
 
