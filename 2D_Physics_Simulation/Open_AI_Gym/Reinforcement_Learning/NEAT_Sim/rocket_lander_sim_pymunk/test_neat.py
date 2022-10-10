@@ -10,6 +10,7 @@ import gym
 import rocket_lander
 
 FPS = 40
+SLOW_MODE = True
 
 local_dir = os.path.dirname(__file__)
 genome_path = 'stats/winner.pickle'
@@ -79,9 +80,12 @@ while runs < MAX_RUNS:
         action = np.argmax(net.activate(observation))
     except NameError:
         action = env.action_space.sample()
-
-    observation, reward, done, truncated, info = env.step(action)
     
+    if SLOW_MODE and (steps % 100 == 0):
+        observation, reward, done, truncated, info = env.step(action)
+    else:
+        observation, reward, done, truncated, info = env.step(action)
+        
     steps += 1
     reward_per_step.append(reward)
 
