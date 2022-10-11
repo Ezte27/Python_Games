@@ -34,6 +34,6 @@ for i in range(1, NUM_RUNS):
     model.learn(total_timesteps = TIMESTEPS, reset_num_timesteps = False, tb_log_name = "PPO")
     model.save(f"{local_dir}/{models_dir}/{TIMESTEPS*i}")
 
-print(f"\nTraining done in: {Fore.LIGHTGREEN_EX}{round((((time() - starttime) / 60) / 60), ndigits=2)}hours{Fore.RESET}\n")
+print(f"\nTraining done in: {Fore.LIGHTGREEN_EX}{round((((time.time() - starttime) / 60) / 60), ndigits=2)}hours{Fore.RESET}\n")
 
 env.close()
