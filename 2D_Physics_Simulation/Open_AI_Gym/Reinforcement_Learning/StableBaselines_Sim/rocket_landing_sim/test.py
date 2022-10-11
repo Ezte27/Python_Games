@@ -1,8 +1,9 @@
-from time import sleep, time
+import time
 import gym
 from stable_baselines3 import A2C, PPO
 import os
 from colorama import Fore
+import rocket_lander
 
 local_dir   = os.path.dirname(__file__)
 models_dir  = "models"
@@ -23,7 +24,7 @@ keywords = ['awful', 'acceptable', 'outstanding']
 
 if TEST_ACCURACY:
     print(f"The testing has {Fore.GREEN}STARTED SUCCESSFULLY{Fore.RESET}")
-    starttime = time()
+    starttime = time.time()
 
 for ep in range(EPISODES):
     observation = env.reset()
@@ -38,8 +39,8 @@ for ep in range(EPISODES):
             landings += 1
 
 if TEST_ACCURACY:
-    print(f"Testing done in: {Fore.LIGHTGREEN_EX}{round(time() - starttime, ndigits=2)} secs{Fore.RESET}")
-    sleep(2.5)
+    print(f"Testing done in: {Fore.LIGHTGREEN_EX}{round(time.time() - starttime, ndigits=2)} secs{Fore.RESET}")
+    time.sleep(2.5)
 
 accuracy = (landings / EPISODES)
 print(f"The model landed successfully {Fore.CYAN}{landings}{Fore.RESET} over a total of {Fore.GREEN}{EPISODES}{Fore.RESET} landing attempts.")
