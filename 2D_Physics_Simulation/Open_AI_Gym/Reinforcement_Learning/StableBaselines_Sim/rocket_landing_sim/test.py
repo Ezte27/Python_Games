@@ -12,7 +12,7 @@ model_path = f"{models_dir}/{model_name}"
 EPISODES      = 5
 TEST_ACCURACY = True
 
-env = gym.make("LunarLander-v2")
+env = gym.make("RocketLander-v0")
 observation = env.reset()
 
 model = PPO.load(model_path, env=env)
