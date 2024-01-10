@@ -1,17 +1,17 @@
-from random import randint
-import pygame
-import os
-from support import import_folder
+from menu import Menu
 from settings import *
 from player import Player
-from overlay import Overlay
-from sprites import Generic, Water, WildFlower, Tree, Interaction, Particle, HouseWall, HouseRoof
-from entities import Entity
-from transition import Transition
+from sky import Rain, Sky 
 from soil import SoilLayer
-from sky import Rain, Sky
-from menu import Menu
+from entities import Entity
+from overlay import Overlay
+from transition import Transition
+from support import import_folder
+from sprites import Generic, Water, WildFlower, Tree, Interaction, Particle, HouseWall, HouseRoof
+from random import randint
 from pytmx.util_pygame import load_pygame
+import os
+import pygame
 
 class Level:
     def __init__(self) -> None:
@@ -25,9 +25,6 @@ class Level:
         self.tree_sprites = pygame.sprite.Group()
         self.interaction_sprites = pygame.sprite.Group()
         self.houseRoof_sprites = pygame.sprite.Group()
-
-        # Extra
-        self.cwd = os.getcwd()
 
         # Soil
         self.soil_layer = SoilLayer(self.all_sprites, self.collision_sprites)
@@ -48,17 +45,17 @@ class Level:
         self.shop_active = False
 
         # Sounds
-        self.success_sound = pygame.mixer.Sound(f"{os.getcwd()}{SUCCESS_SOUND_PATH}")
+        self.success_sound = pygame.mixer.Sound(os.path.join(PARENT_PATH,SUCCESS_SOUND_PATH))
         self.success_sound.set_volume(SUCCESS_SOUND_VOLUME)
 
-        self.bg_music = pygame.mixer.Sound(f"{os.getcwd()}{BG_MUSIC_SOUND_PATH}")
+        self.bg_music = pygame.mixer.Sound(os.path.join(PARENT_PATH, BG_MUSIC_SOUND_PATH))
         self.bg_music.set_volume(BG_MUSIC_SOUND_VOLUME)
 
         # Background Music
         self.bg_music.play(loops = -1)
 
     def setup(self):
-        tmx_data = load_pygame(f"{self.cwd}{MAP2}")
+        tmx_data = load_pygame(os.path.join(PARENT_PATH, MAP1))
 
         # Ground
         for layer in ['Ground', 'Hills']:
@@ -88,7 +85,7 @@ class Level:
             Generic((x * TILE_SIZE, y * TILE_SIZE), surf, [self.all_sprites, self.collision_sprites], LAYERS['main'])
 
         # Water
-        water_frames = import_folder(f"{self.cwd}{WATER}")
+        water_frames = import_folder(os.path.join(PARENT_PATH, WATER))
         for x, y, surf in tmx_data.get_layer_by_name('Water').tiles():
             Water((x * TILE_SIZE, y * TILE_SIZE), water_frames, self.all_sprites)
 
@@ -101,7 +98,7 @@ class Level:
             Tree((obj.x, obj.y), obj.image, [self.all_sprites, self.collision_sprites, self.tree_sprites], obj.name, player_add = self.player_add_item)
 
         # Ground
-        #Generic((0, 0), pygame.image.load(os.getcwd() + GROUND2).convert_alpha(), self.all_sprites, z=LAYERS['ground'])
+        #Generic((0, 0), pygame.image.load(os.path.join(PARENT_PATH, GROUND2)).convert_alpha(), self.all_sprites, z=LAYERS['ground'])
         
         # Collision Tiles
         for x, y, surf in tmx_data.get_layer_by_name('Collision').tiles():
@@ -116,8 +113,13 @@ class Level:
             elif obj.name == "Trader":
                 Interaction((obj.x, obj.y), (obj.width, obj.height), [self.interaction_sprites], obj.name)
         
+        # Trader
+        for obj in tmx_data.get_layer_by_name('Player'):
+            if obj.name == "Trader":
+                Generic((obj.x, obj.y), pygame.image.load(os.path.join(PARENT_PATH, "graphics/objects/merchant.png")).convert_alpha(), [self.all_sprites, self.collision_sprites], LAYERS['main'], name="Trader")
+
         # Entities
-        # Entity((900, 900), pygame.image.load(f"{os.getcwd()}/graphics/mobs/pig/Pig1.png").convert_alpha(), [self.all_sprites])
+        # Entity((900, 900), pygame.image.load(os.path.join(PARENT_PATH, "graphics/mobs/pig/Pig1.png")).convert_alpha(), [self.all_sprites])
     
     def player_add_item(self, item, n = 1):
 
@@ -146,14 +148,19 @@ class Level:
     def reset_day(self):
 
         # Trees
-        for tree in self.tree_sprites.sprites():
-            if tree.isAlive:
-                for apple in tree.apple_sprites.sprites():
-                    apple.kill()
-                tree.create_fruit()
+        for tree in self.tree_sprites.sprites(): # TODO: There is a problem with the tree_sprites list. It contains some Generic objects with names: None. Uncomment the next line to see what im talking about.
+            # print(tree.name)
+            if hasattr(tree, "isAlive"):
+                if tree.isAlive:
+                    for apple in tree.apple_sprites.sprites():
+                        apple.kill()
+                    tree.create_fruit()
+                else:
+                    tree.daysToRegen -= 1
+
 
         # Raining
-        self.raining = randint(0, 10) <= RAIN_PROBABILITY
+        self.raining = (randint(1, 10) <= RAIN_PROBABILITY)
         self.soil_layer.raining = self.raining
         
         # Plants
@@ -202,14 +209,6 @@ class Level:
         else:
             self.transition.play_house_roof(dt, 0)
 
-        # if self.check_house_roof_visibility():
-        #     for sprite in self.all_sprites.sprites():
-        #         if hasattr(sprite, 'name') and sprite.name == "HouseRoof":
-        #             self.all_sprites.remove(sprite)
-            
-        # else:
-        #     self.all_sprites.add(self.houseRoof_sprites.sprites())
-
         # Transition Overlay
         if self.player.sleep:
             self.transition.play_sleep(dt)
@@ -231,7 +230,6 @@ class CameraGroup(pygame.sprite.Group):
                     offset_rect = sprite.rect.copy()
                     offset_rect.center -= self.offset
                     self.display_surface.blit(sprite.image, offset_rect)
-
                     # DEBUG
                     # if sprite == player:
                     #     hitbox_rect = player.hitbox.copy()

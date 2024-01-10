@@ -1,5 +1,5 @@
-import pygame
 from settings import *
+import pygame
 
 class Transition:
     def __init__(self, reset, player, roof_sprites:pygame.sprite.Group) -> None:

@@ -1,8 +1,8 @@
-import pygame
-import os
-from settings import *
-from support import *
 from pytmx.util_pygame import load_pygame
+import os
+import pygame
+from support import *
+from settings import *
 from random import choice
 
 class SoilTile(pygame.sprite.Sprite):
@@ -25,7 +25,7 @@ class Plant(pygame.sprite.Sprite):
 
         # Plant Setup
         self.plant_type = plant_type
-        self.frames = import_folder(f'{os.getcwd()}/graphics/crops/{self.plant_type}/plant')
+        self.frames = import_folder(os.path.join(PARENT_PATH, f"graphics/crops/{self.plant_type}/plant"))
         self.soil = soil
         self.check_watered = check_watered
         self.harvestable = False
@@ -67,8 +67,8 @@ class SoilLayer:
         self.plant_sprites = pygame.sprite.Group()
 
         # Graphics
-        self.soil_surfs = import_folder_dict("graphics/soil")
-        self.water_surfs = import_folder("graphics/soil_water")
+        self.soil_surfs = import_folder_dict(os.path.join(PARENT_PATH, "graphics/soil"))
+        self.water_surfs = import_folder(os.path.join(PARENT_PATH, "graphics/soil_water"))
 
         self.create_soil_grid()
         self.hitBoxes = []
@@ -77,18 +77,18 @@ class SoilLayer:
         self.raining = False
 
         # Sounds
-        self.hoe_sound = pygame.mixer.Sound(f"{os.getcwd()}{HOE_SOUND_PATH}")
+        self.hoe_sound = pygame.mixer.Sound(os.path.join(PARENT_PATH, HOE_SOUND_PATH))
         self.hoe_sound.set_volume(HOE_SOUND_VOLUME)
 
-        self.planting_sound = pygame.mixer.Sound(f"{os.getcwd()}{PLANTING_SOUND_PATH}")
+        self.planting_sound = pygame.mixer.Sound(os.path.join(PARENT_PATH,PLANTING_SOUND_PATH))
         self.planting_sound.set_volume(PLANTING_SOUND_VOLUME)
 
     def create_soil_grid(self):
-        ground = pygame.image.load(os.getcwd() + GROUND1)
+        ground = pygame.image.load(os.path.join(PARENT_PATH, GROUND1))
         horizontal_tiles, vertical_tiles = ground.get_width() // TILE_SIZE, ground.get_height() // TILE_SIZE
 
         self.grid = [[[] for col in range(horizontal_tiles)] for row in range(vertical_tiles)]
-        for x, y, _ in load_pygame(os.getcwd() + MAP1).get_layer_by_name("Farmable").tiles():
+        for x, y, _ in load_pygame(os.path.join(PARENT_PATH, MAP1)).get_layer_by_name("Farmable").tiles():
             self.grid[y][x].append("F")
     
     def create_hitBoxes(self):

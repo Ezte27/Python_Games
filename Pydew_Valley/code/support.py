@@ -1,6 +1,6 @@
+from os import walk
 import pygame
 import pathlib
-from os import walk
 
 def import_folder(path):
     surface_list = []
@@ -11,7 +11,8 @@ def import_folder(path):
             image_surf = pygame.image.load(full_path).convert_alpha()
             surface_list.append(image_surf)
 
-
+    if not surface_list:
+        print(f"WARNING: This path -> {path} could not be resolved.")
     return surface_list
 
 def import_folder_dict(path):

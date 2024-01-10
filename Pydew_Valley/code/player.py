@@ -1,9 +1,9 @@
+from support import *
+from settings import *
+from timer import Timer
+import os
 import pygame
 import pathlib
-import os
-from settings import *
-from support import *
-from timer import Timer
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos:tuple, group, collision_sprites:pygame.sprite.Group, tree_sprites:pygame.sprite.Group, interaction:pygame.sprite.Group, soil_layer, toggle_shop) -> None:
@@ -75,7 +75,7 @@ class Player(pygame.sprite.Sprite):
         self.toggle_shop = toggle_shop
 
         # Sounds
-        self.watering_sound = pygame.mixer.Sound(f"{os.getcwd()}{WATERING_SOUND_PATH}")
+        self.watering_sound = pygame.mixer.Sound(os.path.join(PARENT_PATH, WATERING_SOUND_PATH))
         self.watering_sound.set_volume(WATERING_SOUND_VOLUME)
     
     def use_tool(self):
@@ -111,7 +111,7 @@ class Player(pygame.sprite.Sprite):
                            'right_water': [], 'left_water': [], 'up_water': [], 'down_water': []}
 
         for animation in self.animations.keys():
-            full_path = os.getcwd() + "/graphics/character/" + animation
+            full_path = os.path.join(PARENT_PATH, f"graphics/character/{animation}")
             self.animations[animation] = import_folder(full_path)
 
     def animate(self, dt):

@@ -1,5 +1,5 @@
-import pygame
 from settings import *
+import pygame
 
 class Entity(pygame.sprite.Sprite):
     def __init__(self, pos, surf, groups, z=LAYERS['main'], name = None) -> None:

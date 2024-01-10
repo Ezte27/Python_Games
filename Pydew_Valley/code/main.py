@@ -1,7 +1,7 @@
-import pygame
-import sys
 from settings import *
 from level import Level
+import sys
+import pygame
 
 class Game:
     def __init__(self) -> None:
