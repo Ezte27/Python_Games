@@ -1,6 +1,7 @@
-from msilib.schema import Directory
-import pygame
 from config import *
+from msilib.schema import Directory
+import os
+import pygame
 
 class Weapon(pygame.sprite.Sprite):
     def __init__(self, player, groups):
@@ -9,7 +10,7 @@ class Weapon(pygame.sprite.Sprite):
         self.direction = player.status.split('_')[0]
 
         #graphics
-        full_path = f'Zelda2D/assets/graphics/weapons/{player.weapon}/{self.direction}.png'
+        full_path = os.path.join(PARENT_PATH, f'assets/graphics/weapons/{player.weapon}/{self.direction}.png')
         self.image = pygame.image.load(full_path).convert_alpha()
 
         #placement

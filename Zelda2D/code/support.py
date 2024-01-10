@@ -1,5 +1,5 @@
-from csv import reader
 from os import walk
+from csv import reader
 from os.path import join
 import pygame
 

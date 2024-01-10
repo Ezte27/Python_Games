@@ -1,7 +1,8 @@
-import pygame
 from config import *
-from entity import Entity
 from support import *
+from entity import Entity
+import os
+import pygame
 
 class Enemy(Entity):
     def __init__(self,monster_name,  pos, groups, obstacles, damage_player, add_exp):
@@ -43,7 +44,7 @@ class Enemy(Entity):
     
     def import_graphics(self, monster_name):
         self.animations = {'idle': [], 'move': [], 'attack': []}
-        full_path = f'Zelda2D/assets/graphics/monsters/{monster_name}/'
+        full_path = os.path.join(PARENT_PATH, f'assets/graphics/monsters/{monster_name}/')
 
         for animation in self.animations.keys():
             self.animations[animation] = import_folder(full_path + animation)

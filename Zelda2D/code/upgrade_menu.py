@@ -1,5 +1,5 @@
-import pygame
 from config import *
+import pygame
 
 class Upgrade_menu:
     def __init__(self, player):

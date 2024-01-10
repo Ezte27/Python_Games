@@ -1,6 +1,5 @@
-import pygame
-
 from config import *
+import pygame
 
 class Tree(pygame.sprite.Sprite):
     def __init__(self, pos, groups, surface = pygame.Surface((TILESIZE, TILESIZE))):

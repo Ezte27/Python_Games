@@ -1,7 +1,8 @@
+from config import WIDTH, HEIGHT
 import pygame
+
 pygame.init()
 font = pygame.font.Font(None, 30)
-from config import WIDTH, HEIGHT
 
 def debug(info, y = 10, x = WIDTH - 10, BGcolor = 'Black', TextColor = 'White'):
     display_surface = pygame.display.get_surface()

@@ -1,7 +1,10 @@
-import pygame, sys
+# To activate conda env:
+# C:\Users\ested\anaconda3\Scripts\activate.bat
+from level import *
 from config import *
 from debug import debug # Used for debugging purposes and initializes pygame for the entire game
-from level import *
+import sys
+import pygame
 
 class Game:
     def __init__(self):
@@ -17,7 +20,12 @@ class Game:
                     pygame.quit()   
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_m:
+                    keys_pressed = pygame.key.get_pressed()
+                    if keys_pressed[pygame.K_LCTRL] and keys_pressed[pygame.K_c]:
+                        # Exit game
+                        pygame.quit()   
+                        sys.exit()
+                    if keys_pressed[pygame.K_m]:
                         # Show map and menu
                         self.level1.toggle_menu()
 

@@ -1,24 +1,24 @@
-import pygame
-from attack import Weapon, Fist
+from ui import UI
 from config import *
+from tree import Tree
 from tile import Tile
-from player import Player
+from enemy import Enemy
 from debug import debug
+from player import Player
+from attack import Weapon, Fist
+from upgrade_menu import Upgrade_menu
 from support import import_csv_layout, import_folder
 from random import choice
-from ui import UI
-from tree import Tree
-from enemy import Enemy
-from upgrade_menu import Upgrade_menu
-from pathlib import Path
+import os
 import sys
+import pygame
 
-floorBlocks_file_path = Path("Zelda2D\map\map_FloorBlocks.csv").resolve().absolute()
-grass_file_path = Path('Zelda2D\map\map_Grass.csv').resolve().absolute()
-objects_file_path = Path('Zelda2D\map\map_Objects.csv').resolve().absolute()
-entities_file_path = Path('Zelda2D\map\map_Entities.csv').resolve().absolute()
-grass_folder_path = Path('Zelda2D/assets/graphics/grass').resolve().absolute()
-objects_folder_path = Path('Zelda2D/assets/graphics/objects').resolve().absolute()
+floorBlocks_file_path = os.path.join(PARENT_PATH, "map/map_FloorBlocks.csv")
+grass_file_path = os.path.join(PARENT_PATH, 'map/map_Grass.csv')
+objects_file_path = os.path.join(PARENT_PATH, 'map/map_Objects.csv')
+entities_file_path = os.path.join(PARENT_PATH, 'map/map_Entities.csv')
+grass_folder_path = os.path.join(PARENT_PATH, 'assets/graphics/grass')
+objects_folder_path = os.path.join(PARENT_PATH, 'assets/graphics/objects')
 
 class Level:
     def __init__(self):
@@ -33,6 +33,10 @@ class Level:
         self.attack_sprites = pygame.sprite.Group()
         self.attackable_sprites = pygame.sprite.Group()
 
+        # Sounds
+        self.bg_music = pygame.mixer.Sound(BG_MUSIC_SOUND_PATH)
+        self.bg_music.set_volume(BG_MUSIC_SOUND_VOLUME)
+
         self.clock = pygame.time.Clock()
 
         self.create_map()
@@ -40,6 +44,9 @@ class Level:
         self.ui = UI()
         self.upgrade_menu = Upgrade_menu(self.player)
         self.game_paused = False
+
+        # Background Music
+        self.bg_music.play(loops = -1)
     
     def create_map(self):
         layouts = {
@@ -153,7 +160,7 @@ class Level:
     def add_exp(self, amount):
         self.player.exp += amount
 
-ground_file_path = Path('Zelda2D/assets/graphics/tilemap/ground.png').resolve().absolute()
+ground_file_path = os.path.join(PARENT_PATH, 'assets/graphics/tilemap/ground.png')
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
